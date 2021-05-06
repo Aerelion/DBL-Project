@@ -1,4 +1,4 @@
-# dbl-project
+# dbl2
 
 ## Project setup
 ```
