@@ -51,7 +51,7 @@ export default {
             })
           })
           },
-        saveDataToDB() {
+      saveDataToDB() {
           db.collection("datasets").add(this.datasets).then((docRef) => {
             var sucMsg = document.getElementById("msg")
             sucMsg.innerHTML = "The dataset has been uploaded successfully."
@@ -61,7 +61,7 @@ export default {
             console.error("Error adding document: ", error);
           })
           },
-        showDatabaseEntries(name, link) {
+      showDatabaseEntries(name, link) {
           var ul = document.getElementById('list');
           var header = document.createElement('h2');
           var _name = document.createElement('li');
@@ -75,23 +75,38 @@ export default {
             visDiv.innerHTML="";
             const response = await fetch(link);
             const data = d3.csvParse(await response.text(), d3.autoType);
-            var array = [];
-            data.columns.forEach((hello) => {
-              var obj = {}
-              obj["property"] = hello;
-              obj["value"] = hello.length;
-              array.push(obj)
+            var edges = [];
+            var nodes = [];
+            //console.log(data);
+            data.forEach((x) => {
+              var objEdges = {}
+              objEdges["source"] = x.fromId;
+              objEdges["target"] = x.toId;
+              edges.push(objEdges);
+              var objNodesTo = {}
+              var objNodesFrom = {}
+              var index = nodes.findIndex(o => o.employeeID == x.fromId)
+              if(index === -1) {
+                objNodesFrom["employeeID"] = x.fromId;
+                nodes.push(objNodesFrom);
+              }
+              var index2 = nodes.findIndex(o => o.employeeID == x.toId)
+              if(index2 === -1) {
+                objNodesTo["employeeID"] = x.toId;
+                nodes.push(objNodesTo);
+              }
             })
             //testParaghraph.innerHTML = data.columns.length;
             //visDiv.appendChild(testParaghraph);
-            this.generateArc(array);
-            console.log(array);
+            console.log(edges);
+            console.log(nodes);
+            this.generateNetwork(edges, nodes);
           }
           ul.appendChild(header);
           ul.appendChild(_name);
           ul.appendChild(_visualise);
         },
-        getAllDatabaseEntries() {
+      getAllDatabaseEntries() {
           db.collection('datasets').get().then((snapshot) => {
             snapshot.forEach((doc) => {
               let name = doc.data().dataName;
@@ -102,13 +117,9 @@ export default {
           }
           )
         },
-        generateArc(array) {
+    generateNetwork(edges, nodes) {
       var w = 500;
       var h = 500;
-      var colors = d3.scaleOrdinal(d3.schemeDark2);
-      //var margin = 45;
-
-      //var radius = Math.min(w, h) / 2 - margin
 
       var svg = d3
         .select("#vis")
@@ -116,23 +127,73 @@ export default {
         .attr("width", w)
         .attr("height", h)
         .style("background", "black");
+      
+      var simulation = d3.forceSimulation(nodes)
+          .force("charge", d3.forceManyBody().strength(-5))
+          .force("link", d3.forceLink().id(function (d) {return d.employeeID;}).links(edges))
+          .force("center", d3.forceCenter(w / 2, h / 2))
+          .on("end", ticked);
 
-      var data = d3.pie().sort(null).value(function(d){return d.value})(array);
-      var arcs = d3.arc()
-                    .innerRadius(0)
-                    .outerRadius(200)
-                    .padAngle(.05)
-                    .padRadius(50);
-      var pies = svg.append("g").attr("transform", "translate(250, 250)")
-                               .selectAll("path").data(data);
-      pies.enter().append("path").attr("d", arcs).attr("fill", function(d){return colors(d.data.value);});
+        var link = svg
+          .append("g")
+          .attr("class", "links")
+          .selectAll("line")
+          .data(edges)
+          .enter()
+          .append("line")
+          .style("stroke", "#aaa");
+
+        var node = svg
+          .append("g")
+          .attr("class", "nodes")
+          .selectAll("circle")
+          .data(nodes)
+          .enter()
+          .append("circle")
+          .attr("r", 5)
+          .attr("fill", function() {return "red";});
+        
+        function ticked() {
+          link
+            .attr("x1", function(d) {
+              return d.source.x;
+            })
+            .attr("y1", function(d) {
+              return d.source.y;
+            })
+            .attr("x2", function(d) {
+              return d.target.x;
+            })
+            .attr("y2", function(d) {
+              return d.target.y;
+            });
+            
+            node
+              .attr("cx", function(d) {
+              return d.x;
+            })
+              .attr("cy", function(d) {
+              return d.y;
+            });
+        }
+        console.log(simulation);
 }
 }
 }
+
+
 </script>
 <style scoped>
   ul{
     list-style-type: none;
   }
-</style>
+  .edges line {
+      stroke: rgb(255, 255, 255);
+      stroke-opacity: 0.6;
+    }
 
+    .nodes circle {
+      stroke: rgb(255, 255, 255);
+      stroke-width: 1.5px;
+    }
+</style>
