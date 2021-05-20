@@ -4,9 +4,11 @@
     <input type="text" placeholder="Name of the Dataset" v-model=datasets.dataName class="form-control">
     <p id="msg"></p><br><br>
     <input type="file" accept=".csv" @change="selectFile"><button @click="uploadFile">Upload</button><br><br>
-    <ul id="list"> </ul>
   </div><br><br>
-  <div id="vis"></div>
+  <div class="row">
+  <ul id="list" class="column"> </ul>
+  <div id="vis" class="column"></div>
+  </div>
 </template>
 
 <script>
@@ -96,8 +98,6 @@ export default {
                 nodes.push(objNodesTo);
               }
             })
-            //testParaghraph.innerHTML = data.columns.length;
-            //visDiv.appendChild(testParaghraph);
             console.log(edges);
             console.log(nodes);
             this.generateNetwork(edges, nodes);
@@ -118,23 +118,26 @@ export default {
           )
         },
     generateNetwork(edges, nodes) {
-      var w = 500;
-      var h = 500;
+      var w = 1000;
+      var h = 600;
 
       var svg = d3
         .select("#vis")
         .append("svg")
         .attr("width", w)
         .attr("height", h)
-        .style("background", "black");
+        .style("background", "black")
+        .call(d3.zoom().on('zoom', (event) => {
+            svg.attr('transform', event.transform).scaleExtent([1,24]);}))
+        .append('g');
       
       var simulation = d3.forceSimulation(nodes)
-          .force("charge", d3.forceManyBody().strength(-5))
+          .force("charge", d3.forceManyBody().strength(-50))
           .force("link", d3.forceLink().id(function (d) {return d.employeeID;}).links(edges))
           .force("center", d3.forceCenter(w / 2, h / 2))
           .on("end", ticked);
 
-        var link = svg
+        var edge = svg
           .append("g")
           .attr("class", "links")
           .selectAll("line")
@@ -148,13 +151,13 @@ export default {
           .attr("class", "nodes")
           .selectAll("circle")
           .data(nodes)
-          .enter()
-          .append("circle")
+          .join("circle")
           .attr("r", 5)
-          .attr("fill", function() {return "red";});
+          .attr("fill", function() {return "blue";})
+          //.call(dragNodes(simulation));
         
         function ticked() {
-          link
+          edge
             .attr("x1", function(d) {
               return d.source.x;
             })
@@ -176,8 +179,133 @@ export default {
               return d.y;
             });
         }
-        console.log(simulation);
+        /*function dragNodes(simulation) { // This needs a lot more optimization, so it is being left out for the prototype.
+          function dragStarted(event) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            event.subject.fx = event.subject.x;
+            event.subject.fy = event.subject.y;
+          }
+          
+          function dragged(event) {
+            event.subject.fx = event.x;
+            event.subject.fy = event.y;
+          }
+          
+          function dragEnded(event) {
+            if (!event.active) simulation.alphaTarget(0);
+            event.subject.fx = null;
+            event.subject.fy = null;
+          }
+          
+          return d3.drag()
+              .on("start", dragStarted)
+              .on("drag", dragged)
+              .on("end", dragEnded);
+        }*/
+      console.log(simulation)
+      return svg.node();
 }
+/*generateNetworkWithCanvas(edges, nodes) { //Trying to optimize by using a canvas instead of svg, should improve performance of the full dataset quite a bit, but just testing atm. Not included in the prototype.
+      var w = 1000;
+      var h = 600;
+      var r = 5;
+
+      var htmlCanvas = d3
+        .select("#vis")
+        .append("canvas")
+        .attr("width", w)
+        .attr("height", h)
+        .style("background", "black");
+      
+      var canvasToolbox = htmlCanvas.node().getContext('2d'); //Canvas toolbox, it is an object carrying all the properties and methods we need to draw on the canvas.
+      
+      //var div = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+      
+      var simulation = d3.forceSimulation(nodes)
+          .force("charge", d3.forceManyBody().strength(-30))
+          .force("x", d3.forceX(w / 2).strength(0.1))
+          .force("y", d3.forceY(h / 2).strength(0.1))
+          .force("link", d3.forceLink().id(function (d) {return d.employeeID;}).links(edges))
+          .force("center", d3.forceCenter(w / 2, h / 2));
+      
+      var transform = d3.zoomIdentity;
+
+      initGraph(edges, nodes);
+
+      function initGraph(edges, nodes) {
+        
+        function zoomed(event) {
+          console.log("zooming");
+          transform = event.transform;
+          ticked()
+        }
+        console.log("Hello")
+        d3.select(htmlCanvas)
+            .call(d3.drag().subject(dragsubject).on("start", dragStarted).on("drag", dragged).on("end",dragEnded))
+            .call(d3.zoom().scaleExtent([1 / 10, 8]).on("zoom", zoomed));
+        
+        function dragsubject(event) {
+          var i,
+          x = transform.invertX(event.x),
+          y = transform.invertY(event.y),
+          dx,
+          dy;
+          for (i = nodes.length - 1; i >= 0; --i) {
+            var node = nodes[i];
+            dx = x - node.x;
+            dy = y - node.y;
+
+            if (dx * dx + dy * dy < r * r) {
+
+              node.x =  transform.applyX(node.x);
+              node.y = transform.applyY(node.y);
+
+              return node;
+            }
+          }
+        }
+        function dragStarted(event) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            event.subject.fx = event.subject.x;
+            event.subject.fy = event.subject.y;
+          }
+          
+          function dragged(event) {
+            event.subject.fx = event.x;
+            event.subject.fy = event.y;
+          }
+          
+          function dragEnded(event) {
+            if (!event.active) simulation.alphaTarget(0);
+            event.subject.fx = null;
+            event.subject.fy = null;
+          }
+          simulation.nodes(nodes).on('tick', ticked);
+          simulation.force("link").links(edges);
+          
+          function ticked() {
+          canvasToolbox.save();
+          canvasToolbox.clearRect(0, 0, w, h);
+          canvasToolbox.translate(transform.x, transform.y);
+          canvasToolbox.scale(transform.k, transform.k);
+
+          edges.forEach(function (d) {
+            canvasToolbox.beginPath();
+            canvasToolbox.moveTo(d.source.x, d.source.y);
+            canvasToolbox.lineTo(d.target.x, d.target.y);
+            canvasToolbox.stroke();
+          });
+          nodes.forEach(function (d) {
+            canvasToolbox.beginPath();
+            canvasToolbox.arc(d.x, d.y, r, 0, 2 * Math.PI, true);
+            canvasToolbox.fillStyle = d.col ? "red":"black"
+            canvasToolbox.fill();
+          });
+          canvasToolbox.restore();
+        }
+
+      }
+}*/
 }
 }
 
@@ -195,5 +323,11 @@ export default {
     .nodes circle {
       stroke: rgb(255, 255, 255);
       stroke-width: 1.5px;
+    }
+    .row {
+      display: flex;
+    }
+    .column {
+      flex: 50%;
     }
 </style>
