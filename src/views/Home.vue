@@ -47,7 +47,8 @@ export default {
           let fileName = `${this.selectedFile.name}`;
           var storageRef = firebase.storage().ref(fileName);
           let uploadTask = storageRef.put(this.selectedFile);
-          uploadTask.on('state_changed', (error) => {
+          uploadTask.on('state_changed',() => {
+          }, (error) => {
             //Handle unsuccessfull uploads.
             console.log(error);
           }, () => {
@@ -73,7 +74,7 @@ export default {
           var header = document.createElement('h2');
           var _name = document.createElement('li');
           var _visualise = document.createElement('button');
-          var visDiv = document.getElementById('visLeft');
+          var visDiv = document.getElementById('visRight');
          // var testParaghraph = document.createElement("h2");
           header.innerHTML = "Dataset-"+ (++this.datasetNo);
           _name.innerHTML="Name of the dataset: "+name;
@@ -124,10 +125,10 @@ export default {
         },
     generateNetwork(edges, nodes) {
       var w = 0.5 * window.innerWidth;
-      var h = 0.8 * window.innerHeight;
+      var h = 0.85 * window.innerHeight;
 
       var svg = d3
-        .select("#visLeft")
+        .select("#visRight")
         .append("svg")
         .attr("width", w)
         .attr("height", h)
@@ -321,26 +322,24 @@ export default {
     position: absolute;
     display: grid;
     width: 100%;
-    height: 100%;
+    height: 90.5%;
     background-color: #3f3f3f;
     grid-template-columns: 1fr 1fr;
     color: white;
     z-index: -10;
+    transition: margin-left .5s;
   }
   
   .side {
     position: absolute;
   }
 
-  /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
-#main {
-  transition: margin-left .5s; /* If you want a transition effect */
-  padding: 20px;
-}
-
-
-  #viscontent {
+  #visLeft {
     border-right: 3px solid white;
-    height: 100%
+    transition: margin-left .5s;
+  }
+
+  #visRight {
+    transition: margin-left .5s;
   }
 </style>

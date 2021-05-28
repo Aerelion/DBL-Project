@@ -3,7 +3,7 @@
         <a href="javascript:void(0)" class="closebtn" @click="closeBar">&times;</a>
 
         <div class="fileUpload">
-          <input type="text" placeholder="Name of the Dataset">
+          <input type="text" placeholder="Name of the Dataset" v-model=datasets.dataName>
           <p id="msg"></p>
           <input type="file" accept=".csv" @change="selectFile"><button @click="uploadFile">Upload</button>
         </div>
@@ -29,19 +29,65 @@
 </template>
 
 <script>
+import firebase from 'firebase';
+import {db} from '../main'
+
 export default{
+      data () {
+        return {
+          datasets: {
+            fileLink: null,
+            dataName: null,
+          },
+            selectedFile: null,
+            datasetNo: 0
+        }
+     },
+
     methods: {
         /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
         openBar() {
             document.getElementById("theSidebar").style.width = "300px";
-            document.getElementById("viscontent").style.marginLeft = "300px";
+            document.getElementById("visLeft").style.marginLeft = "300px";
         },
 
         /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
         closeBar() {
             document.getElementById("theSidebar").style.width = "0";
-            document.getElementById("viscontent").style.marginLeft = "0";
-        }
+            document.getElementById("visLeft").style.marginLeft = "0";
+        },
+
+        
+
+        selectFile(event) {
+          this.selectedFile = event.target.files[0] //Selects the uploaded file and assigns it to the "selectedFile" variable.
+          //TODO: Add proper checks to ensure that the files given are csv files.
+        },
+        uploadFile() {
+            let fileName = `${this.selectedFile.name}`;
+            var storageRef = firebase.storage().ref(fileName);
+            let uploadTask = storageRef.put(this.selectedFile);
+            uploadTask.on('state_changed', (error) => {
+              //Handle unsuccessfull uploads.
+              console.log(error);
+            }, () => {
+              //Handle successfull uploads.
+              uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                this.datasets.fileLink = downloadURL;
+                this.saveDataToDB();
+              })
+            })
+            },
+        saveDataToDB() {
+            db.collection("datasets").add(this.datasets).then((docRef) => {
+              var sucMsg = document.getElementById("msg")
+              sucMsg.innerHTML = "The dataset has been uploaded successfully."
+              console.log("Document written with ID: ", docRef.id);
+            })
+            .catch( (error) => {
+              console.error("Error adding document: ", error);
+            })
+            }
     }
 }
 </script>
@@ -63,6 +109,7 @@ export default{
   transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
   float:left;
 }
+
 
 
 .sidebar a:hover {
