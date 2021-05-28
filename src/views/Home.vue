@@ -4,10 +4,10 @@
       <Sidebar/>
     </div>
     <div class="visGrid">
-      <div id="viscontent">
+      <div id="visLeft">
       </div>
 
-      <div id="viscontent2">
+      <div id="visRight">
       </div>
     </div>
   </div>
@@ -73,7 +73,7 @@ export default {
           var header = document.createElement('h2');
           var _name = document.createElement('li');
           var _visualise = document.createElement('button');
-          var visDiv = document.getElementById('viscontent');
+          var visDiv = document.getElementById('visLeft');
          // var testParaghraph = document.createElement("h2");
           header.innerHTML = "Dataset-"+ (++this.datasetNo);
           _name.innerHTML="Name of the dataset: "+name;
@@ -127,7 +127,7 @@ export default {
       var h = 0.8 * window.innerHeight;
 
       var svg = d3
-        .select("#viscontent")
+        .select("#visLeft")
         .append("svg")
         .attr("width", w)
         .attr("height", h)
