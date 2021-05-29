@@ -1,7 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import About from '../views/About.vue'
-import fileUpload from '../views/fileUpload.vue'
 
 const routes = [
   {
@@ -13,11 +12,6 @@ const routes = [
     path: '/about',
     name: 'About',
     component: About
-  },
-  {
-    path: '/fileupload',
-    name: 'fileUpload',
-    component: fileUpload
   }
 ]
 

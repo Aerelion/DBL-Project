@@ -1,11 +1,13 @@
 <template>
-<!-- Stuff we want on all of the pages will be here -->
+  <!-- Stuff we want on all of the pages will be here -->
+  <div class="header">
+    <h1>DBL project</h1>
+  </div>
   <div id="nav">
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/fileupload">File Upload</router-link> |
+    <router-link to="/about">About</router-link>
   </div>
-  <router-view/>
+  <router-view />
 </template>
 
 <style>
@@ -17,16 +19,44 @@
   color: #2c3e50;
 }
 
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+
+}
+
 #nav {
-  padding: 30px;
+  padding: 10px;
+  background-color: #2c3e50;
+  border-bottom: 3px solid black;
+  color: white;
 }
 
 #nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: white;
 }
 
 #nav a.router-link-exact-active {
+  color: #42b983;
+}
+
+.header {
+  background: #2c3e50;
+  color: white;
+}
+
+.header h1 {
+  padding: 5px;
+}
+
+.header a {
+  font-weight: bold;
+  color: #50921b;
+}
+
+.header a.router-link-exact-active {
   color: #42b983;
 }
 </style>
