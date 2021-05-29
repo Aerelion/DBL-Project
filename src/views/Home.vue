@@ -21,8 +21,8 @@
     <div class="windowSelection">
       <h3>Select visualisation window</h3>
       <select id="testSelect">
-        <option value="Left">Left</option>
-        <option value="Right">Right</option>
+        <option value="visLeft">Left</option>
+        <option value="visRight">Right</option>
       </select>
     </div>
 
@@ -37,7 +37,7 @@
 
   <div class="visGrid">
     <div id="visLeft"></div>
-
+      
     <div id="visRight"></div>
   </div>
 </template>
@@ -71,17 +71,16 @@ export default {
       var header = document.createElement("h2");
       var _name = document.createElement("li");
       var _visualise = document.createElement("button");
-      var visDiv = document.getElementById("visLeft");
       header.innerHTML = "Dataset-" + ++this.datasetNo;
       _name.innerHTML = "Name of the dataset: " + name;
       _visualise.innerHTML = "Visualise";
       _visualise.onclick = async () => {
+        var visDiv = document.getElementById(document.getElementById("testSelect").value);
         visDiv.innerHTML = "";
         const response = await fetch(link);
         const data = d3.csvParse(await response.text(), d3.autoType);
         var edges = [];
         var nodes = [];
-        //console.log(data);
         data.forEach((x) => {
           var objEdges = {};
           objEdges["source"] = x.fromId;

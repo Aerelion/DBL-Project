@@ -2,9 +2,10 @@ import * as d3 from "d3";
 function generateNetwork(edges, nodes) {
     var w = 0.5 * window.innerWidth;
     var h = 0.8 * window.innerHeight;
+    var side = "#" + document.getElementById("testSelect").value;
 
     var svg = d3
-      .select("#visLeft")
+      .select(side)
       .append("svg")
       .attr("width", w)
       .attr("height", h)
