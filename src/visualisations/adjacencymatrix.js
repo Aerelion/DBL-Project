@@ -1,5 +1,8 @@
-import * as d3 from "d3";
+//import * as d3 from "d3";
 
-function generateMatrix(){
-    
+function generateMatrix(edges, nodes){
+    console.log(edges);
+    console.log(nodes);
 }
+
+export default generateMatrix

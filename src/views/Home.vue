@@ -17,12 +17,17 @@
       </button>
     </div>
 
-    <!-- Does not do anything yet -> link with js function to select either viscontent or viscontent2 -->
     <div class="windowSelection">
       <h3>Select visualisation window</h3>
       <select id="testSelect">
         <option value="visLeft">Left</option>
         <option value="visRight">Right</option>
+      </select>
+
+      <h3 class="type">Select visualisation type</h3>
+      <select id="visType">
+        <option value="nodelink">Node-Link Diagram</option>
+        <option value="matrix">Adjacency Matrix</option>
       </select>
     </div>
 
@@ -36,9 +41,8 @@
   </div>
 
   <div class="visGrid">
-    <div id="visLeft"></div>
-      
-    <div id="visRight"></div>
+    <div id="viscontent"><div id="visLeft"></div></div>
+    <div id="viscontent"><div id="visRight"></div></div>
   </div>
 </template>
 
@@ -47,6 +51,7 @@ import firebase from "firebase";
 import * as d3 from "d3";
 import { db } from "../main";
 import generateNetwork from "../visualisations/nodelink";
+import generateMatrix from "../visualisations/adjacencymatrix";
 
 export default {
   name: "Home",
@@ -75,7 +80,9 @@ export default {
       _name.innerHTML = "Name of the dataset: " + name;
       _visualise.innerHTML = "Visualise";
       _visualise.onclick = async () => {
-        var visDiv = document.getElementById(document.getElementById("testSelect").value);
+        var visDiv = document.getElementById(
+          document.getElementById("testSelect").value
+        );
         visDiv.innerHTML = "";
         const response = await fetch(link);
         const data = d3.csvParse(await response.text(), d3.autoType);
@@ -99,14 +106,17 @@ export default {
             nodes.push(objNodesTo);
           }
         });
-        console.log(edges);
-        console.log(nodes);
-        generateNetwork(edges, nodes);
+        if (document.getElementById("visType").value == "nodelink") {
+          generateNetwork(edges, nodes);
+        } else if (document.getElementById("visType").value == "matrix") {
+          generateMatrix(edges, nodes);
+        }
       };
       ul.appendChild(header);
       ul.appendChild(_name);
       ul.appendChild(_visualise);
     },
+
     getAllDatabaseEntries() {
       db.collection("datasets")
         .get()
@@ -118,6 +128,7 @@ export default {
           });
         });
     },
+
     /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
     openBar() {
       document.getElementById("theSidebar").style.width = "300px";
@@ -129,10 +140,12 @@ export default {
       document.getElementById("theSidebar").style.width = "0";
       document.getElementById("viscontent").style.marginLeft = "0";
     },
+
     selectFile(event) {
       this.selectedFile = event.target.files[0]; //Selects the uploaded file and assigns it to the "selectedFile" variable.
       //TODO: Add proper checks to ensure that the files given are csv files.
     },
+
     uploadFile() {
       let fileName = `${this.selectedFile.name}`;
       var storageRef = firebase.storage().ref(fileName);
@@ -153,6 +166,7 @@ export default {
         }
       );
     },
+
     saveDataToDB() {
       db.collection("datasets")
         .add(this.datasets)
@@ -168,12 +182,13 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .visGrid {
   position: absolute;
   display: grid;
-  width: 100%;
-  height: 90%;
+  width: 99.85%;
+  height: 100%;
   background-color: #3f3f3f;
   grid-template-columns: 1fr 1fr;
   color: white;
@@ -187,8 +202,10 @@ export default {
 }
 
 #viscontent {
-  border-right: 3px solid white;
+  position: relative;
   height: 100%;
+  width: 100%;
+  border: 3px solid white;
 }
 
 .sidebar {
@@ -268,4 +285,8 @@ export default {
     font-size: 18px;
   }
 }
+.type {
+  margin-top: 0.5cm;
+}
+
 </style>

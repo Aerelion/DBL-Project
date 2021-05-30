@@ -23,7 +23,7 @@
   padding: 0;
   margin: 0;
   border: 0;
-
+  overflow: hidden;
 }
 
 #nav {
