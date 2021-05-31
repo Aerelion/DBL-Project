@@ -187,25 +187,21 @@ export default {
 .visGrid {
   position: absolute;
   display: grid;
-  width: 99.85%;
+  width: 100%;
   height: 100%;
   background-color: #3f3f3f;
   grid-template-columns: 1fr 1fr;
   color: white;
   z-index: -10;
+  transition: margin-left .5s;
 }
 
 /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
-#main {
-  transition: margin-left 0.5s; /* If you want a transition effect */
-  padding: 100px;
-}
 
 #viscontent {
   position: relative;
   height: 100%;
   width: 100%;
-  border: 3px solid white;
 }
 
 .sidebar {
@@ -287,6 +283,15 @@ export default {
 }
 .type {
   margin-top: 0.5cm;
+}
+
+#visLeft{
+  transition: margin-left .5s;
+  border-right: 3px solid white;
+}
+
+#visRight{
+  transition: margin-left .5s;
 }
 
 </style>
