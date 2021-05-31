@@ -196,12 +196,13 @@ export default {
   transition: margin-left .5s;
 }
 
-/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+
 
 #viscontent {
   position: relative;
   height: 100%;
   width: 100%;
+  transition: margin-left .5s;
 }
 
 .sidebar {
