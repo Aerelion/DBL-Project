@@ -77,6 +77,9 @@ function generateNetwork(edges, nodes) {
         return d.y;
       });
   }
+  
+    
+
   function dragNodes(simulation) { // This needs a lot more optimization, so it is being left out for the prototype.
       function dragStarted(event) {
         if (!event.active) simulation.alphaTarget(0.3).restart();
