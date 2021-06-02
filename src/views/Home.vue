@@ -132,13 +132,14 @@ export default {
     /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
     openBar() {
       document.getElementById("theSidebar").style.width = "300px";
-      document.getElementById("viscontent").style.marginLeft = "300px";
+      document.getElementById("visLeft").style.marginLeft = "300px";
+      
     },
 
     /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
     closeBar() {
       document.getElementById("theSidebar").style.width = "0";
-      document.getElementById("viscontent").style.marginLeft = "0";
+      document.getElementById("visLeft").style.marginLeft = "0";
     },
 
     selectFile(event) {
