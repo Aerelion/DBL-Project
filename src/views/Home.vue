@@ -294,5 +294,5 @@ export default {
 #visRight{
   transition: margin-left .5s;
 }
-
+/**/
 </style>
