@@ -44,6 +44,14 @@
     <div id="viscontent"><div id="visLeft"></div></div>
     <div id="viscontent"><div id="visRight"></div></div>
   </div>
+  <div class="sliderLeft">
+    <input type="range" min="1" max="100" value="50" class="slider" id="rangeLeft" @input="showRangeValueLeft">
+    <p id="rangeValueLeft">test</p>
+  </div>
+  <div class="sliderRight">
+    <input type="range" min="1" max="100" value="50" class="slider" id="rangeRight" @input="showRangeValueRight">
+    <p id="rangeValueRight">test</p>
+  </div>
 </template>
 
 <script>
@@ -70,7 +78,17 @@ export default {
     this.getAllDatabaseEntries(); //the mounted() lifecycle executes after all components of the page have finished loading, so after the page is ready
     // the previous uploaded datasets are visible in the page.
   },
+
   methods: {
+    showRangeValueLeft() {
+      var x = document.getElementById("rangeLeft").value;
+      document.getElementById("rangeValueLeft").innerHTML = x;
+    },
+
+    showRangeValueRight() {
+      var x = document.getElementById("rangeRight").value;
+      document.getElementById("rangeValueRight").innerHTML = x;
+    },
     showDatabaseEntries(name, link) {
       var ul = document.getElementById("list");
       var header = document.createElement("h2");
@@ -128,15 +146,14 @@ export default {
           });
         });
     },
+    
 
-    /* Set the width of the sidebar to 250px and the left margin of the page content to 250px */
     openBar() {
       document.getElementById("theSidebar").style.width = "300px";
       document.getElementById("visLeft").style.marginLeft = "300px";
       
     },
 
-    /* Set the width of the sidebar to 0 and the left margin of the page content to 0 */
     closeBar() {
       document.getElementById("theSidebar").style.width = "0";
       document.getElementById("visLeft").style.marginLeft = "0";
@@ -180,7 +197,9 @@ export default {
           console.error("Error adding document: ", error);
         });
     },
+    
   },
+
 };
 </script>
 
@@ -274,15 +293,7 @@ export default {
   border-bottom: 2px solid white;
 }
 
-/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
-@media screen and (max-height: 450px) {
-  .sidebar {
-    padding-top: 15px;
-  }
-  .sidebar a {
-    font-size: 18px;
-  }
-}
+
 .type {
   margin-top: 0.5cm;
 }
@@ -295,5 +306,36 @@ export default {
 #visRight{
   transition: margin-left .5s;
 }
+
+.sliderLeft{
+  position: absolute;
+  bottom: 0;
+  width: 50%;
+  background-color: #2c3e50;
+  height: 40px;
+}
+
+.sliderRight{
+  position: absolute;
+  bottom: 0;
+  width: 50%;
+  background-color: #2c3e50;
+  height: 40px;
+  display: inline;
+}
+
+.slider{
+  width: 80%;
+}
+
+
+#rangeValueLeft{
+  color: white;
+}
+
+#rangeValueRight{
+  color: white;
+}
+
 
 </style>
