@@ -20,8 +20,8 @@
     <div class="windowSelection">
       <h3>Select visualisation window</h3>
       <select id="testSelect">
-        <option value="visLeft">Left</option>
-        <option value="visRight">Right</option>
+        <option value="canvasLeft">Left</option>
+        <option value="canvasRight">Right</option>
       </select>
 
       <h3 class="type">Select visualisation type</h3>
@@ -41,8 +41,8 @@
   </div>
 
   <div class="visGrid">
-    <div id="viscontent"><div id="visLeft"></div></div>
-    <div id="viscontent"><div id="visRight"></div></div>
+    <div id="viscontent"><canvas id="canvasLeft"></canvas></div>
+    <div id="viscontent"><canvas id="canvasRight"></canvas></div>
   </div>
   <div class="sliderLeft">
     <input type="range" min="1" max="100" value="50" class="slider" id="rangeLeft" @input="showRangeValueLeft">
@@ -58,8 +58,9 @@
 import firebase from "firebase";
 import * as d3 from "d3";
 import { db } from "../main";
-import generateNetwork from "../visualisations/nodelink";
+//import generateNetwork from "../visualisations/nodelink";
 import generateMatrix from "../visualisations/adjacencymatrix";
+import generateNetworkCanvas from "../visualisations/nodelinkv2.0";
 
 export default {
   name: "Home",
@@ -125,7 +126,8 @@ export default {
           }
         });
         if (document.getElementById("visType").value == "nodelink") {
-          generateNetwork(edges, nodes);
+          var canvas;
+          generateNetworkCanvas(edges, nodes, canvas);
         } else if (document.getElementById("visType").value == "matrix") {
           generateMatrix(edges, nodes);
         }
@@ -298,12 +300,12 @@ export default {
   margin-top: 0.5cm;
 }
 
-#visLeft{
+.canvasLeft{
   transition: margin-left .5s;
   border-right: 3px solid white;
 }
 
-#visRight{
+.canvasRight{
   transition: margin-left .5s;
 }
 
