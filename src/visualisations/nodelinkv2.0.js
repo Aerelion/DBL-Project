@@ -104,11 +104,8 @@ function generateNetworkCanvas(edges, nodes, canvas) {
             .on("drag", dragged)
             .on("end", dragEnded);
       }
-    //d3.select(ctx.canvas).call(d3.zoom().scaleExtent)[1/10, 8].on("zoom", zooming);
-    //zooming();
-    /*console.log(simulation)
-    console.log(dragNodes)*/
-    return d3.select(ctx.canvas).call(dragNodes(simulation)).call(d3.zoom().scaleExtent([1/10, 8]).on("zoom", zooming)).node();
+    console.log(zooming)
+    return d3.select(ctx.canvas).call(dragNodes(simulation)).node();
 }
 
 
