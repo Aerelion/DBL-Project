@@ -8,10 +8,7 @@ function generateMatrix(edges, nodes) {
 
   const squareSize = Math.floor(h / nodes.length) - 1;
 
-  // nodePositions is an array that stores the positions where the nodes should be displayed in the adj matrix
-  // this array has undefined gaps, but its size will never be larger than the largest node id number
-  // a better approach is by using hash tables, but this should work for the enron dataset
-  // this method is very fast, but doesn't work if this is a large ID number
+  // nodePositions is an object that stores the positions where the nodes should be displayed in the adj matrix
   var nodePositions = {};
   for (var i = 0; i < nodes.length; i++) {
     let position = (nodes[i].employeeID).toString()
