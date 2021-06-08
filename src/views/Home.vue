@@ -111,6 +111,7 @@ export default {
           var objEdges = {};
           objEdges["source"] = x.fromId;
           objEdges["target"] = x.toId;
+          objEdges["sentiment"] = x.sentiment;
           edges.push(objEdges);
           var objNodesTo = {};
           var objNodesFrom = {};
