@@ -40,7 +40,8 @@ function generateMatrix(edges, nodes) {
     })
     .attr("height", squareSize)
     .attr("width", squareSize)
-    .attr("fill", "white");
+    .attr("fill", "white")
+    .style("opacity", 0.15);  // this makes it so that overlayed rectangles can be seen (kind of adds weights to the edges)
 
   console.log(nodes, edges, nodePositions);
 }
