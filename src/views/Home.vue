@@ -21,7 +21,7 @@
       <h3>Select visualisation window</h3>
       <select id="testSelect">
         <option value="canvasLeft">Left</option>
-        <option value="canvasRight">Right</option>
+        <option value="visRight">Right</option>
       </select>
 
       <h3 class="type">Select visualisation type</h3>
@@ -42,7 +42,7 @@
 
   <div class="visGrid">
     <div id="viscontent"><canvas id="canvasLeft"></canvas></div>
-    <div id="viscontent"><canvas id="canvasRight"></canvas></div>
+    <div id="viscontent"><div id="visRight"></div></div>
   </div>
   <div class="sliderLeft">
     <input type="range" min="1" max="100" value="50" class="slider" id="rangeLeft" @input="showRangeValueLeft">
