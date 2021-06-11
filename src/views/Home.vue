@@ -93,6 +93,9 @@ export default {
     showDatabaseEntries(name, link) {
       var ul = document.getElementById("list");
       var header = document.createElement("h2");
+
+      var selection = null;
+
       var _name = document.createElement("li");
       var _visualise = document.createElement("button");
       header.innerHTML = "Dataset-" + ++this.datasetNo;
@@ -133,7 +136,7 @@ export default {
         });
         if (document.getElementById("visType").value == "nodelink") {
           var canvas;
-          generateNetworkCanvas(edges, nodes, canvas);
+          generateNetworkCanvas(edges, nodes, canvas, selection);
         } else if (document.getElementById("visType").value == "matrix") {
           generateMatrix(edges, nodes);
         }

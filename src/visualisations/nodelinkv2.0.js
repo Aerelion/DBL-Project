@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 
 
-function generateNetworkCanvas(edges, nodes, canvas) {
+function generateNetworkCanvas(edges, nodes, canvas, selection) {
     var side = document.getElementById("testSelect").value;
     var w = document.getElementById("viscontent").clientWidth;
     var h = document.getElementById("viscontent").clientHeight;
@@ -17,7 +17,6 @@ function generateNetworkCanvas(edges, nodes, canvas) {
     
 
     var transform = d3.zoomIdentity;
-    var selection = null;
     
     var simulation = d3 //done
     .forceSimulation(nodes)
@@ -45,6 +44,14 @@ function generateNetworkCanvas(edges, nodes, canvas) {
 
         ctx.strokeStyle = "#fff";
         for (const node of nodes) {
+            // Change selected node to stand out
+            if (node == selection) {
+                ctx.strokeStyle = "#000";
+                ctx.fillStyle = "#ff0000";
+            } else {
+                ctx.strokeStyle = "#fff";
+                ctx.fillStyle = "#000";
+            }
             ctx.beginPath();
             drawNode(node) 
             ctx.fillStyle = color(node);
