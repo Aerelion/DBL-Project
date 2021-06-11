@@ -41,7 +41,7 @@
   </div>
 
   <div class="visGrid">
-    <div id="viscontent"><canvas id="canvasLeft"></canvas></div>
+    <div id="viscontent"><div id="visLeft"><canvas id="canvasLeft"></canvas></div></div>
     <div id="viscontent"><div id="visRight"></div></div>
   </div>
   <div class="sliderLeft">
@@ -112,17 +112,22 @@ export default {
           objEdges["source"] = x.fromId;
           objEdges["target"] = x.toId;
           objEdges["sentiment"] = x.sentiment;
+          objEdges["messageType"] = x.messageType;
           edges.push(objEdges);
           var objNodesTo = {};
           var objNodesFrom = {};
           var index = nodes.findIndex((o) => o.employeeID == x.fromId);
           if (index === -1) {
             objNodesFrom["employeeID"] = x.fromId;
+            objNodesFrom["email"] = x.fromEmail;
+            objNodesFrom["jobTitle"] = x.fromJobtitle;
             nodes.push(objNodesFrom);
           }
           var index2 = nodes.findIndex((o) => o.employeeID == x.toId);
           if (index2 === -1) {
             objNodesTo["employeeID"] = x.toId;
+            objNodesTo["email"] = x.toEmail;
+            objNodesTo["jobTitle"] = x.toJobtitle;
             nodes.push(objNodesTo);
           }
         });
@@ -301,12 +306,12 @@ export default {
   margin-top: 0.5cm;
 }
 
-.canvasLeft{
+#visLeft{
   transition: margin-left .5s;
   border-right: 3px solid white;
 }
 
-.canvasRight{
+#visRight{
   transition: margin-left .5s;
 }
 

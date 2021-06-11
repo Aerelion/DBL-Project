@@ -2,7 +2,7 @@ import * as d3 from "d3";
 
 function generateMatrix(edges, nodes) {
 
-  var side = document.getElementById("testSelect").options[1].value;
+  var side = document.getElementById("testSelect").value;
   var w = document.getElementById("viscontent").clientWidth;
   var h = document.getElementById("viscontent").clientHeight;
 
