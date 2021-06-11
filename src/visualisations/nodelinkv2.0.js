@@ -51,7 +51,7 @@ function generateNetworkCanvas(edges, nodes, canvas) {
             ctx.fill();
             ctx.stroke();
         }
-        drawText()
+        drawNodeInformation(selection)
     }
 
     function drawEdge(d) {
@@ -67,21 +67,38 @@ function generateNetworkCanvas(edges, nodes, canvas) {
         ctx.fillText("ID: " + d.employeeID, d.x+10, d.y+3);
     }
 
-    function drawText() {
-        if (selection != null) {
-            var popupX = selection.x + 10;
-            var popupY = selection.y + 10;
-            var popupSize = ctx.measureText(selection.email).width + 4;
+    function drawNodeInformation(d) {
+        if (d != null) {
+            var popupX = d.x + 10;
+            var popupY = d.y + 10;
+            var popupSize = ctx.measureText(d.email).width + 4;
             ctx.fillStyle = "#fff";
             ctx.fillRect(popupX, popupY, popupSize, 36);
 
             ctx.strokeStyle = "#000"
             ctx.strokeRect(popupX, popupY, popupSize, 36);
             ctx.fillStyle = "#000";
-            ctx.fillText(selection.employeeID, popupX + 2, popupY + 10);
-            ctx.fillText(selection.jobTitle, popupX + 2, popupY + 20);
-            ctx.fillText(selection.email, popupX + 2, popupY + 30);
+            ctx.fillText(extractName(d.email) + " | " + d.employeeID, popupX + 2, popupY + 10);
+            ctx.fillText(d.jobTitle, popupX + 2, popupY + 20);
+            ctx.fillText(d.email, popupX + 2, popupY + 30);
         }
+    }
+
+    function extractName(email) {
+        // Splice off the email server
+        var nameBuilder = email.substring(0, email.indexOf("@"));
+        // Split mail into seperate names
+        nameBuilder = nameBuilder.split(".");
+        // Initialize surnames and capitalize
+        var name = "";
+        for (var i = 0; i < nameBuilder.length; i++) {
+            if (i < nameBuilder.length-1) {
+                name = name + nameBuilder[i][0].toUpperCase() + ".";
+            } else {
+                name = name + " " + nameBuilder[i][0].toUpperCase() + nameBuilder[i].substring(1);
+            }
+        }
+        return name
     }
 
     function color() {
