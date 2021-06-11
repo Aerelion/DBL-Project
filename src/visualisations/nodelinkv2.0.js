@@ -17,6 +17,7 @@ function generateNetworkCanvas(edges, nodes, canvas) {
     
 
     var transform = d3.zoomIdentity;
+    var selection = null;
     
     var simulation = d3 //done
     .forceSimulation(nodes)
@@ -50,7 +51,7 @@ function generateNetworkCanvas(edges, nodes, canvas) {
             ctx.fill();
             ctx.stroke();
         }
-        //drawText()
+        drawText()
     }
 
     function drawEdge(d) {
@@ -66,13 +67,23 @@ function generateNetworkCanvas(edges, nodes, canvas) {
         ctx.fillText("ID: " + d.employeeID, d.x+10, d.y+3);
     }
 
-    /*function drawText(d) {
-      ctx.strokeRect(w-210, 10, 200, 100);
-      ctx.fillText(d.employeeID, (w-210) + 10, 10+3)
-      
+    function drawText() {
+        if (selection != null) {
+            var popupX = selection.x + 10;
+            var popupY = selection.y + 10;
+            var popupSize = ctx.measureText(selection.email).width + 4;
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(popupX, popupY, popupSize, 36);
 
+            ctx.strokeStyle = "#000"
+            ctx.strokeRect(popupX, popupY, popupSize, 36);
+            ctx.fillStyle = "#000";
+            ctx.fillText(selection.employeeID, popupX + 2, popupY + 10);
+            ctx.fillText(selection.jobTitle, popupX + 2, popupY + 20);
+            ctx.fillText(selection.email, popupX + 2, popupY + 30);
+        }
     }
-console.log(drawText)*/
+
     function color() {
         var scale = d3.scaleOrdinal(d3.schemeCategory10);
         return d => scale(d.group);
@@ -86,6 +97,7 @@ console.log(drawText)*/
 
     function onClick(event) {
         console.log(event.subject);
+        selection = event.subject;
     }
 
     function dragNodes(simulation) {
