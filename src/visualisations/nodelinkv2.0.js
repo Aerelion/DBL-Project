@@ -9,8 +9,8 @@ function generateNetworkCanvas(edges, nodes, canvas) {
     canvas = document.getElementById(side);
     canvas.width = w;
     canvas.height = h;
-    console.log(edges)
-    console.log(nodes)
+    console.log(edges);
+    console.log(nodes);
 
     var ctx = canvas.getContext("2d");
     ctx.strokeStyle = "red"
@@ -92,10 +92,12 @@ function generateNetworkCanvas(edges, nodes, canvas) {
         // Initialize surnames and capitalize
         var name = "";
         for (var i = 0; i < nameBuilder.length; i++) {
-            if (i < nameBuilder.length-1) {
-                name = name + nameBuilder[i][0].toUpperCase() + ".";
-            } else {
-                name = name + " " + nameBuilder[i][0].toUpperCase() + nameBuilder[i].substring(1);
+            if (nameBuilder[i] != null && nameBuilder[i].length > 0) {
+                if (i < nameBuilder.length-1) {
+                    name = name + nameBuilder[i][0].toUpperCase() + ".";
+                } else {
+                    name = name + " " + nameBuilder[i][0].toUpperCase() + nameBuilder[i].substring(1);
+                }
             }
         }
         return name
