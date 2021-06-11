@@ -44,11 +44,11 @@ function generateNetworkCanvas(edges, nodes, canvas) {
 
         ctx.strokeStyle = "#fff";
         for (const node of nodes) {
-        ctx.beginPath();
-        drawNode(node) 
-        ctx.fillStyle = color(node);
-        ctx.fill();
-        ctx.stroke();
+            ctx.beginPath();
+            drawNode(node) 
+            ctx.fillStyle = color(node);
+            ctx.fill();
+            ctx.stroke();
         }
         //drawText()
     }
@@ -84,12 +84,19 @@ console.log(drawText)*/
       ticked();
     }
 
+    function onClick(event) {
+        console.log(event.subject);
+    }
+
     function dragNodes(simulation) {
         function dragSubject(event) {
             return simulation.find(event.x, event.y);
         }
 
+        // Use dragStart event to hack in clickability in HTML canvas
         function dragStarted(event) {
+          onClick(event);
+
           if (!event.active) simulation.alphaTarget(0.3).restart();
           event.subject.fx = event.subject.x;
           event.subject.fy = event.subject.y;
@@ -110,10 +117,11 @@ console.log(drawText)*/
             .subject(dragSubject)
             .on("start", dragStarted)
             .on("drag", dragged)
-            .on("end", dragEnded);
-      }
+            .on("end", dragEnded)
+        }
+
     console.log(zooming)
-    return d3.select(ctx.canvas).call(dragNodes(simulation)).on("click", function() {d3.select(this).style("stroke", "red"); console.log(d3.select(this))}).node();
+    return d3.select(ctx.canvas).call(dragNodes(simulation)).node();
 }
 
 
