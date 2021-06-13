@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-function generateMatrix(edges, nodes) {
+function generateMatrix(edges, nodes, edgeWeights) {
 
   var side = document.getElementById("testSelect").value;
   var w = document.getElementById("viscontent").clientWidth;
@@ -15,6 +15,8 @@ function generateMatrix(edges, nodes) {
     nodePositions[position] = i;
   }
 
+  const minOpacity = 0.3; // opacity of an edge with weight 1
+  const logCoefficient = (1 - minOpacity) / Math.log2(edgeWeights.maxWeight); // coeficient that is used to calculate opacity
 
   var svg = d3
     .select('#' + side)
@@ -41,9 +43,8 @@ function generateMatrix(edges, nodes) {
     .attr("height", squareSize)
     .attr("width", squareSize)
     .attr("fill", "white")
-    .style("opacity", 0.15);  // this makes it so that overlayed rectangles can be seen (kind of adds weights to the edges)
+    .style("opacity", ((d) => { return (Math.log2(d.weight) * logCoefficient) + minOpacity }));  // this makes it so that overlayed rectangles can be seen (kind of adds weights to the edges)
 
-  console.log(nodes, edges, nodePositions);
 }
 
 export default generateMatrix

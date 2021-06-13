@@ -41,15 +41,33 @@
   </div>
 
   <div class="visGrid">
-    <div id="viscontent"><div id="visLeft"><canvas id="canvasLeft"></canvas></div></div>
+    <div id="viscontent">
+      <div id="visLeft"><canvas id="canvasLeft"></canvas></div>
+    </div>
     <div id="viscontent"><div id="visRight"></div></div>
   </div>
   <div class="sliderLeft">
-    <input type="range" min="1" max="100" value="50" class="slider" id="rangeLeft" @input="showRangeValueLeft">
+    <input
+      type="range"
+      min="1"
+      max="100"
+      value="50"
+      class="slider"
+      id="rangeLeft"
+      @input="showRangeValueLeft"
+    />
     <p id="rangeValueLeft">test</p>
   </div>
   <div class="sliderRight">
-    <input type="range" min="1" max="100" value="50" class="slider" id="rangeRight" @input="showRangeValueRight">
+    <input
+      type="range"
+      min="1"
+      max="100"
+      value="50"
+      class="slider"
+      id="rangeRight"
+      @input="showRangeValueRight"
+    />
     <p id="rangeValueRight">test</p>
   </div>
 </template>
@@ -108,37 +126,102 @@ export default {
         visDiv.innerHTML = "";
         const response = await fetch(link);
         const data = d3.csvParse(await response.text(), d3.autoType);
+
         var edges = [];
         var nodes = [];
+
+        // "edgeWeights.weight[source][target]" can be used to get the weight of the source-target edge
+        // "edgeWeights.maxWeight" is the largest edge weight in the dataset
+        // this is used as an intermediary variable to calculate wEdges (weighted edges)
+        var edgeWeights = {
+          weight: {},
+          maxWeight: 0,
+        };
+
+        // weighted edges (maybe we will replace edges with this, as it adds weights to edges and also should improve performance)
+        var wEdges = [];
+
+        var maxDate = new Date(-3155692597470);
+        var minDate = new Date(3155692597470);
+
+        // this function auto-executes whenever visualise is clicked
+        // the purpose of this function is to calculate the minDate and the maxDate of the given dataset
+        (function () {
+          data.forEach((x) => {
+            // check if current date is larger than maxDate
+            if (x.date > maxDate) {
+              maxDate = x.date;
+            }
+
+            // check if current date is smaller than minDate
+            if (x.date < minDate) {
+              minDate = x.date;
+            }
+          });
+        })();
+
         data.forEach((x) => {
           var objEdges = {};
           objEdges["source"] = x.fromId;
           objEdges["target"] = x.toId;
           objEdges["sentiment"] = x.sentiment;
           objEdges["messageType"] = x.messageType;
+          objEdges["date"] = x.date;
           edges.push(objEdges);
           var objNodesTo = {};
           var objNodesFrom = {};
+
           var index = nodes.findIndex((o) => o.employeeID == x.fromId);
           if (index === -1) {
             objNodesFrom["employeeID"] = x.fromId;
             objNodesFrom["email"] = x.fromEmail;
             objNodesFrom["jobTitle"] = x.fromJobtitle;
             nodes.push(objNodesFrom);
+
+            // add missing node ID to edgeWeights
+            edgeWeights.weight[x.fromId] = {};
           }
+
           var index2 = nodes.findIndex((o) => o.employeeID == x.toId);
           if (index2 === -1) {
             objNodesTo["employeeID"] = x.toId;
             objNodesTo["email"] = x.toEmail;
             objNodesTo["jobTitle"] = x.toJobtitle;
             nodes.push(objNodesTo);
+
+            // add missing node ID to edgeWeights
+            edgeWeights.weight[x.toId] = {};
+          }
+
+          // init current edge with weight 0
+          edgeWeights.weight[x.fromId][x.toId] = 0;
+        });
+
+        // calculate edgeWeight values
+        data.forEach((x) => {
+          let temp = ++edgeWeights.weight[x.fromId][x.toId];
+
+          if (temp > edgeWeights.maxWeight) {
+            edgeWeights.maxWeight = temp;
           }
         });
+
+        // create array of weighted edges
+        Object.keys(edgeWeights.weight).forEach((fromId) => {
+          Object.keys(edgeWeights.weight[fromId]).forEach((toId) => {
+            let objEdges = {};
+            objEdges["source"] = fromId;
+            objEdges["target"] = toId;
+            objEdges["weight"] = edgeWeights.weight[fromId][toId];
+            wEdges.push(objEdges);
+          });
+        });
+
         if (document.getElementById("visType").value == "nodelink") {
           var canvas;
           generateNetworkCanvas(edges, nodes, canvas, selection);
         } else if (document.getElementById("visType").value == "matrix") {
-          generateMatrix(edges, nodes);
+          generateMatrix(wEdges, nodes, edgeWeights);
         }
       };
       ul.appendChild(header);
@@ -157,12 +240,10 @@ export default {
           });
         });
     },
-    
 
     openBar() {
       document.getElementById("theSidebar").style.width = "300px";
       document.getElementById("visLeft").style.marginLeft = "300px";
-      
     },
 
     closeBar() {
@@ -208,9 +289,7 @@ export default {
           console.error("Error adding document: ", error);
         });
     },
-    
   },
-
 };
 </script>
 
@@ -224,16 +303,14 @@ export default {
   grid-template-columns: 1fr 1fr;
   color: white;
   z-index: -10;
-  transition: margin-left .5s;
+  transition: margin-left 0.5s;
 }
-
-
 
 #viscontent {
   position: relative;
   height: 100%;
   width: 100%;
-  transition: margin-left .5s;
+  transition: margin-left 0.5s;
 }
 
 .sidebar {
@@ -304,21 +381,20 @@ export default {
   border-bottom: 2px solid white;
 }
 
-
 .type {
   margin-top: 0.5cm;
 }
 
-#visLeft{
-  transition: margin-left .5s;
+#visLeft {
+  transition: margin-left 0.5s;
   border-right: 3px solid white;
 }
 
-#visRight{
-  transition: margin-left .5s;
+#visRight {
+  transition: margin-left 0.5s;
 }
 
-.sliderLeft{
+.sliderLeft {
   position: absolute;
   bottom: 0;
   width: 50%;
@@ -326,7 +402,7 @@ export default {
   height: 40px;
 }
 
-.sliderRight{
+.sliderRight {
   position: absolute;
   bottom: 0;
   width: 50%;
@@ -335,18 +411,15 @@ export default {
   display: inline;
 }
 
-.slider{
+.slider {
   width: 80%;
 }
 
-
-#rangeValueLeft{
+#rangeValueLeft {
   color: white;
 }
 
-#rangeValueRight{
+#rangeValueRight {
   color: white;
 }
-
-
 </style>
