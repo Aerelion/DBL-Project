@@ -161,13 +161,6 @@ export default {
         })();
 
         data.forEach((x) => {
-          var objEdges = {};
-          objEdges["source"] = x.fromId;
-          objEdges["target"] = x.toId;
-          objEdges["sentiment"] = x.sentiment;
-          objEdges["messageType"] = x.messageType;
-          objEdges["date"] = x.date;
-          edges.push(objEdges);
           var objNodesTo = {};
           var objNodesFrom = {};
 
@@ -195,6 +188,12 @@ export default {
 
           // init current edge with weight 0
           edgeWeights.weight[x.fromId][x.toId] = 0;
+          let temp = ++edgeWeights.weight[x.fromId][x.toId];
+
+          if (temp > edgeWeights.maxWeight) {
+            edgeWeights.maxWeight = temp;
+          }
+          
         });
 
         // calculate edgeWeight values
@@ -204,6 +203,16 @@ export default {
           if (temp > edgeWeights.maxWeight) {
             edgeWeights.maxWeight = temp;
           }
+          
+          // add the edges to the edges array.
+          var objEdges = {};
+          objEdges["source"] = x.fromId;
+          objEdges["target"] = x.toId;
+          objEdges["sentiment"] = x.sentiment;
+          objEdges["messageType"] = x.messageType;
+          objEdges["date"] = x.date;
+          objEdges["weight"] = edgeWeights.weight[x.fromId][x.toId];
+          edges.push(objEdges);
         });
 
         // create array of weighted edges
@@ -211,7 +220,7 @@ export default {
           Object.keys(edgeWeights.weight[fromId]).forEach((toId) => {
             let objEdges = {};
             objEdges["source"] = fromId;
-            objEdges["target"] = toId;
+            objEdges["target"] =  toId;
             objEdges["weight"] = edgeWeights.weight[fromId][toId];
             wEdges.push(objEdges);
           });

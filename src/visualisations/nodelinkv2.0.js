@@ -38,6 +38,7 @@ function generateNetworkCanvas(edges, nodes, canvas, selection) {
         ctx.translate(transform.x, transform.y);
         ctx.scale(transform.k, transform.k);
         ctx.beginPath();
+        ctx.lineWidth = 1;
         edges.forEach(drawEdge);
         ctx.strokeStyle = "#aaa";
         ctx.stroke();
@@ -71,7 +72,7 @@ function generateNetworkCanvas(edges, nodes, canvas, selection) {
     function drawNode(d) {
         ctx.moveTo(d.x, d.y);
         ctx.arc(d.x, d.y, 3, 0, 2 * Math.PI);
-        ctx.fillText("ID: " + d.employeeID, d.x+10, d.y+3);
+        //ctx.fillText("ID: " + d.employeeID, d.x+10, d.y+3);
     }
 
     function drawNodeInformation(d) {
