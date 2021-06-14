@@ -43,12 +43,17 @@ function generateNetworkCanvas(edges, nodes, canvas, selection) {
         ctx.strokeStyle = "#aaa";
         ctx.stroke();
 
-        ctx.strokeStyle = "#fff";
+        var neighbours = drawEdges(edges);
+        
+        
         for (const node of nodes) {
             // Change selected node to stand out
             if (node == selection) {
                 ctx.strokeStyle = "#000";
                 ctx.fillStyle = "#ff0000";
+            } else if (neighbours.indexOf(node) >= 0) {
+                ctx.strokeStyle = "#000";
+                ctx.fillStyle = "#00ff00";
             } else {
                 ctx.strokeStyle = "#fff";
                 ctx.fillStyle = "#000";
@@ -59,7 +64,44 @@ function generateNetworkCanvas(edges, nodes, canvas, selection) {
             ctx.fill();
             ctx.stroke();
         }
-        drawNodeInformation(selection)
+        drawNodeInformation(selection);
+
+    }
+
+    function drawEdges(edges) {
+        var selectionEdges = [];
+        var normalEdges = [];
+        var neighbours = [];
+
+        if (selection == null) {
+            ctx.beginPath();
+            edges.forEach(drawEdge);
+            ctx.strokeStyle = "#aaa";
+            ctx.stroke();
+        } else {
+            for (const edge of edges) {
+                if (edge.source.employeeID == selection.employeeID) {
+                    selectionEdges.push(edge);
+                    neighbours.push(edge.target);
+                } else if (edge.target.employeeID == selection.employeeID) {
+                    selectionEdges.push(edge);
+                    neighbours.push(edge.source);
+                } else {
+                    normalEdges.push(edge);
+                }
+            }
+            ctx.beginPath();
+            normalEdges.forEach(drawEdge);
+            ctx.strokeStyle = "#aaa";
+            ctx.stroke();
+
+            ctx.beginPath();
+            selectionEdges.forEach(drawEdge);
+            ctx.strokeStyle = "#f58a2c";
+            ctx.stroke();
+        }
+
+        return neighbours;
     }
 
     function drawEdge(d) {
