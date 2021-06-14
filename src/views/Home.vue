@@ -99,6 +99,7 @@ export default {
   },
 
   methods: {
+
     showRangeValueLeft() {
       var x = document.getElementById("rangeLeft").value;
       document.getElementById("rangeValueLeft").innerHTML = x;
@@ -109,6 +110,11 @@ export default {
       document.getElementById("rangeValueRight").innerHTML = x;
     },
     showDatabaseEntries(name, link) {
+      // function sleep(ms) {
+      //   return new Promise(
+      //     resolve => setTimeout(resolve, ms)
+      //   );
+      // }
       var ul = document.getElementById("list");
       var header = document.createElement("h2");
 
@@ -228,6 +234,20 @@ export default {
 
         if (document.getElementById("visType").value == "nodelink") {
           var canvas;
+          // var currentDate = minDate;
+          // while(currentDate <= maxDate) {
+          //     data.forEach((x) => {
+          //         if(x.date > currentDate) {
+          //             nodes.splice(nodes.indexOf(x.toId), 1);
+          //             nodes.splice(nodes.indexOf(x.fromId), 1);
+          //         }
+          //     });
+          //     generateNetworkCanvas(edges, nodes, canvas, selection);
+          //     var newDate = currentDate.setDate(currentDate.getDate() + 1);
+          //     currentDate = new Date(newDate);
+          //     await sleep(1000);
+          //     console.log("step");
+          //    } 
           generateNetworkCanvas(edges, nodes, canvas, selection);
         } else if (document.getElementById("visType").value == "matrix") {
           generateMatrix(wEdges, nodes, edgeWeights);
