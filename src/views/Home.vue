@@ -30,15 +30,14 @@
         <option value="visLeft">Left</option>
       </select>
 
-<!--
+      <!--
       <h3 class="type">Select visualisation type</h3>
       <select id="visType">
         <option value="nodelink">Node-Link Diagram</option>
         <option value="matrix">Adjacency Matrix</option>
       </select>
     </div>
-    -->
-    </div>
+    --></div>
 
     <div class="dataList">
       <ul id="list" class="column"></ul>
@@ -88,6 +87,20 @@ export default {
       },
       selectedFile: null,
       datasetNo: 0,
+      months: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ],
     };
   },
   mounted() {
@@ -98,7 +111,16 @@ export default {
   methods: {
     showRangeValue() {
       var x = document.getElementById("range").value;
-      document.getElementById("rangeValue").innerHTML = x;
+      var dateValue = new Date(parseInt(x));
+
+      var displayDate =
+        this.months[dateValue.getMonth()] +
+        " " +
+        dateValue.getDate() +
+        ", " +
+        dateValue.getFullYear();
+
+      document.getElementById("rangeValue").innerHTML = displayDate;
     },
     showDatabaseEntries(name, link) {
       // function sleep(ms) {
@@ -116,7 +138,7 @@ export default {
       header.innerHTML = "Dataset-" + ++this.datasetNo;
       _name.innerHTML = "Name of the dataset: " + name;
       _visualise.innerHTML = "Visualise";
-      _visualise.onclick = async () => {    
+      _visualise.onclick = async () => {
         var visDiv = document.getElementById(
           document.getElementById("testSelectNL").value
         );
@@ -143,12 +165,12 @@ export default {
         // weighted edges (maybe we will replace edges with this, as it adds weights to edges and also should improve performance)
         var wEdges = [];
 
-        var maxDate = new Date(-3155692597470);
-        var minDate = new Date(3155692597470);
-
         // this function auto-executes whenever visualise is clicked
         // the purpose of this function is to calculate the minDate and the maxDate of the given dataset
         (function () {
+          var maxDate = new Date(-3155692597470);
+          var minDate = new Date(3155692597470);
+
           data.forEach((x) => {
             // check if current date is larger than maxDate
             if (x.date > maxDate) {
@@ -160,6 +182,9 @@ export default {
               minDate = x.date;
             }
           });
+
+          document.getElementById("range").max = maxDate.getTime();
+          document.getElementById("range").min = minDate.getTime();
         })();
 
         data.forEach((x) => {
@@ -195,7 +220,6 @@ export default {
           if (temp > edgeWeights.maxWeight) {
             edgeWeights.maxWeight = temp;
           }
-          
         });
 
         // calculate edgeWeight values
@@ -205,7 +229,7 @@ export default {
           if (temp > edgeWeights.maxWeight) {
             edgeWeights.maxWeight = temp;
           }
-          
+
           // add the edges to the edges array.
           var objEdges = {};
           objEdges["source"] = x.fromId;
@@ -222,29 +246,29 @@ export default {
           Object.keys(edgeWeights.weight[fromId]).forEach((toId) => {
             let objEdges = {};
             objEdges["source"] = fromId;
-            objEdges["target"] =  toId;
+            objEdges["target"] = toId;
             objEdges["weight"] = edgeWeights.weight[fromId][toId];
             wEdges.push(objEdges);
           });
         });
-         // var canvas;
-          // var currentDate = minDate;
-          // while(currentDate <= maxDate) {
-          //     data.forEach((x) => {
-          //         if(x.date > currentDate) {
-          //             nodes.splice(nodes.indexOf(x.toId), 1);
-          //             nodes.splice(nodes.indexOf(x.fromId), 1);
-          //         }
-          //     });
-          //     generateNetworkCanvas(edges, nodes, canvas, selection);
-          //     var newDate = currentDate.setDate(currentDate.getDate() + 1);
-          //     currentDate = new Date(newDate);
-          //     await sleep(1000);
-          //     console.log("step");
-          //    }
-          console.log(edges);
-          generateNetworkCanvas(edges, nodes, selection);
-          generateMatrix(wEdges, nodes, edgeWeights);
+        // var canvas;
+        // var currentDate = minDate;
+        // while(currentDate <= maxDate) {
+        //     data.forEach((x) => {
+        //         if(x.date > currentDate) {
+        //             nodes.splice(nodes.indexOf(x.toId), 1);
+        //             nodes.splice(nodes.indexOf(x.fromId), 1);
+        //         }
+        //     });
+        //     generateNetworkCanvas(edges, nodes, canvas, selection);
+        //     var newDate = currentDate.setDate(currentDate.getDate() + 1);
+        //     currentDate = new Date(newDate);
+        //     await sleep(1000);
+        //     console.log("step");
+        //    }
+        console.log(edges);
+        generateNetworkCanvas(edges, nodes, selection);
+        generateMatrix(wEdges, nodes, edgeWeights);
       };
       ul.appendChild(header);
       ul.appendChild(_name);
@@ -424,7 +448,6 @@ export default {
   height: 40px;
 }
 
-
 .slider {
   width: 80%;
 }
@@ -432,5 +455,4 @@ export default {
 #rangeValue {
   color: white;
 }
-
 </style>
