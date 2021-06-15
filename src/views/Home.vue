@@ -18,17 +18,26 @@
     </div>
 
     <div class="windowSelection">
-      <h3>Select visualisation window</h3>
-      <select id="testSelect">
-        <option value="canvasLeft">Left</option>
+      <h3>Node-Link Diagram Window</h3>
+      <select id="testSelectNL">
+        <option value="visLeft">Left</option>
         <option value="visRight">Right</option>
       </select>
 
+      <h3>Adjacency Matrix Window</h3>
+      <select id="testSelectAM">
+        <option value="visRight">Right</option>
+        <option value="visLeft">Left</option>
+      </select>
+
+<!--
       <h3 class="type">Select visualisation type</h3>
       <select id="visType">
         <option value="nodelink">Node-Link Diagram</option>
         <option value="matrix">Adjacency Matrix</option>
       </select>
+    </div>
+    -->
     </div>
 
     <div class="dataList">
@@ -42,7 +51,7 @@
 
   <div class="visGrid">
     <div id="viscontent">
-      <div id="visLeft"><canvas id="canvasLeft"></canvas></div>
+      <div id="visLeft"></div>
     </div>
     <div id="viscontent"><div id="visRight"></div></div>
   </div>
@@ -99,7 +108,6 @@ export default {
   },
 
   methods: {
-
     showRangeValueLeft() {
       var x = document.getElementById("rangeLeft").value;
       document.getElementById("rangeValueLeft").innerHTML = x;
@@ -125,9 +133,14 @@ export default {
       header.innerHTML = "Dataset-" + ++this.datasetNo;
       _name.innerHTML = "Name of the dataset: " + name;
       _visualise.innerHTML = "Visualise";
-      _visualise.onclick = async () => {
+      _visualise.onclick = async () => {    
         var visDiv = document.getElementById(
-          document.getElementById("testSelect").value
+          document.getElementById("testSelectNL").value
+        );
+        visDiv.innerHTML = "";
+
+        visDiv = document.getElementById(
+          document.getElementById("testSelectAM").value
         );
         visDiv.innerHTML = "";
         const response = await fetch(link);
@@ -231,8 +244,6 @@ export default {
             wEdges.push(objEdges);
           });
         });
-
-        if (document.getElementById("visType").value == "nodelink") {
           var canvas;
           // var currentDate = minDate;
           // while(currentDate <= maxDate) {
@@ -249,9 +260,7 @@ export default {
           //     console.log("step");
           //    } 
           generateNetworkCanvas(edges, nodes, canvas, selection);
-        } else if (document.getElementById("visType").value == "matrix") {
           generateMatrix(wEdges, nodes, edgeWeights);
-        }
       };
       ul.appendChild(header);
       ul.appendChild(_name);
