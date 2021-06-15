@@ -24,7 +24,6 @@ function generateMatrix(edges, nodes, edgeWeights) {
     .append("svg")
     .attr("height", h)
     .attr("width", w)
-    .style("background", "black")
     .call(
       d3.zoom().on("zoom", (event) => {
         svg.attr("transform", event.transform).scaleExtent([1, 24]);
