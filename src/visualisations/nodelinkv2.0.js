@@ -24,7 +24,11 @@ function generateNetworkCanvas(edges, nodes, selection) {
     
     var simulation = d3 //done
     .forceSimulation(nodes)
-    .force("charge", d3.forceManyBody().strength(-50))
+    .force(
+        "charge", 
+        d3.forceManyBody()
+            .strength(-50)
+            .distanceMax(200))
     .force(
       "link",
       d3
@@ -41,10 +45,6 @@ function generateNetworkCanvas(edges, nodes, selection) {
         ctx.clearRect(0,0, canvas.width, canvas.height);
         ctx.translate(transform.x, transform.y);
         ctx.scale(transform.k, transform.k);
-        ctx.beginPath();
-        edges.forEach(drawEdge);
-        ctx.strokeStyle = "#aaa";
-        ctx.stroke();
 
         var neighbours = drawEdges(edges);
         
