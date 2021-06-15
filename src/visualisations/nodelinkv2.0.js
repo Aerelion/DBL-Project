@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 
 
+
 function generateNetworkCanvas(edges, nodes, selection) {
     var side = document.getElementById(document.getElementById("testSelectNL").value);
     var canvas = document.createElement('canvas');
@@ -16,7 +17,8 @@ function generateNetworkCanvas(edges, nodes, selection) {
 
     var ctx = canvas.getContext("2d");
     ctx.strokeStyle = "red"
-    
+    ctx.lineWidth = 0.1;
+
 
     var transform = d3.zoomIdentity;
     
@@ -40,7 +42,6 @@ function generateNetworkCanvas(edges, nodes, selection) {
         ctx.translate(transform.x, transform.y);
         ctx.scale(transform.k, transform.k);
         ctx.beginPath();
-        ctx.lineWidth = 1;
         edges.forEach(drawEdge);
         ctx.strokeStyle = "#aaa";
         ctx.stroke();
@@ -74,7 +75,6 @@ function generateNetworkCanvas(edges, nodes, selection) {
         var selectionEdges = [];
         var normalEdges = [];
         var neighbours = [];
-
         if (selection == null) {
             ctx.beginPath();
             edges.forEach(drawEdge);

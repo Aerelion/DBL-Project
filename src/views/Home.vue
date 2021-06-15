@@ -55,29 +55,17 @@
     </div>
     <div id="viscontent"><div id="visRight"></div></div>
   </div>
-  <div class="sliderLeft">
+  <div class="sliderDiv">
     <input
       type="range"
       min="1"
       max="100"
       value="50"
       class="slider"
-      id="rangeLeft"
-      @input="showRangeValueLeft"
+      id="range"
+      @input="showRangeValue"
     />
-    <p id="rangeValueLeft">test</p>
-  </div>
-  <div class="sliderRight">
-    <input
-      type="range"
-      min="1"
-      max="100"
-      value="50"
-      class="slider"
-      id="rangeRight"
-      @input="showRangeValueRight"
-    />
-    <p id="rangeValueRight">test</p>
+    <p id="rangeValue">test</p>
   </div>
 </template>
 
@@ -108,14 +96,9 @@ export default {
   },
 
   methods: {
-    showRangeValueLeft() {
-      var x = document.getElementById("rangeLeft").value;
-      document.getElementById("rangeValueLeft").innerHTML = x;
-    },
-
-    showRangeValueRight() {
-      var x = document.getElementById("rangeRight").value;
-      document.getElementById("rangeValueRight").innerHTML = x;
+    showRangeValue() {
+      var x = document.getElementById("range").value;
+      document.getElementById("rangeValue").innerHTML = x;
     },
     showDatabaseEntries(name, link) {
       // function sleep(ms) {
@@ -244,7 +227,7 @@ export default {
             wEdges.push(objEdges);
           });
         });
-          var canvas;
+         // var canvas;
           // var currentDate = minDate;
           // while(currentDate <= maxDate) {
           //     data.forEach((x) => {
@@ -258,8 +241,9 @@ export default {
           //     currentDate = new Date(newDate);
           //     await sleep(1000);
           //     console.log("step");
-          //    } 
-          generateNetworkCanvas(edges, nodes, canvas, selection);
+          //    }
+          console.log(edges);
+          generateNetworkCanvas(edges, nodes, selection);
           generateMatrix(wEdges, nodes, edgeWeights);
       };
       ul.appendChild(header);
@@ -432,32 +416,21 @@ export default {
   transition: margin-left 0.5s;
 }
 
-.sliderLeft {
+.sliderDiv {
   position: absolute;
   bottom: 0;
-  width: 50%;
+  width: 100%;
   background-color: #2c3e50;
   height: 40px;
 }
 
-.sliderRight {
-  position: absolute;
-  bottom: 0;
-  width: 50%;
-  background-color: #2c3e50;
-  height: 40px;
-  display: inline;
-}
 
 .slider {
   width: 80%;
 }
 
-#rangeValueLeft {
+#rangeValue {
   color: white;
 }
 
-#rangeValueRight {
-  color: white;
-}
 </style>
