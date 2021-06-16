@@ -128,6 +128,8 @@ export default {
       //     resolve => setTimeout(resolve, ms)
       //   );
       // }
+
+
       var ul = document.getElementById("list");
       var header = document.createElement("h2");
 
@@ -168,6 +170,7 @@ export default {
         // this function auto-executes whenever visualise is clicked
         // the purpose of this function is to calculate the minDate and the maxDate of the given dataset
         (function () {
+
           var maxDate = new Date(-3155692597470);
           var minDate = new Date(3155692597470);
 
@@ -251,21 +254,13 @@ export default {
             wEdges.push(objEdges);
           });
         });
-        // var canvas;
-        // var currentDate = minDate;
-        // while(currentDate <= maxDate) {
-        //     data.forEach((x) => {
-        //         if(x.date > currentDate) {
-        //             nodes.splice(nodes.indexOf(x.toId), 1);
-        //             nodes.splice(nodes.indexOf(x.fromId), 1);
-        //         }
-        //     });
-        //     generateNetworkCanvas(edges, nodes, canvas, selection);
-        //     var newDate = currentDate.setDate(currentDate.getDate() + 1);
-        //     currentDate = new Date(newDate);
-        //     await sleep(1000);
-        //     console.log("step");
-        //    }
+        
+        data.forEach((x) => {
+          if(x.date > document.getElementById("range").value) {
+            edges.splice(edges.indexOf(x), 1)
+            // wEdges.splice(wEdges.indexOf(x), 1)
+          }
+        });
         console.log(edges);
         generateNetworkCanvas(edges, nodes, selection);
         generateMatrix(wEdges, nodes, edgeWeights);
