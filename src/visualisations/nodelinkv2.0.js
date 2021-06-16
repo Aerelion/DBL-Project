@@ -47,9 +47,9 @@ function generateNetworkCanvas(edges, nodes, selection) {
         ctx.scale(transform.k, transform.k);
 
         var neighbours = drawEdges(edges);
-        
-        
+
         for (const node of nodes) {
+            constrainNode(node);
             // Change selected node to stand out
             if (node == selection) {
                 ctx.strokeStyle = "#000";
@@ -68,8 +68,13 @@ function generateNetworkCanvas(edges, nodes, selection) {
             ctx.stroke();
         }
         drawNodeInformation(selection);
-
     }
+
+    
+    function constrainNode(node) {
+        node.x = Math.min(w-6, Math.max(2, node.x));
+        node.y = Math.min(h-130, Math.max(2, node.y));
+    } 
 
     function drawEdges(edges) {
         var selectionEdges = [];
