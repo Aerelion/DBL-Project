@@ -10,8 +10,6 @@ function generateNetworkCanvas(edges, nodes, selection) {
 
     canvas.width = w;
     canvas.height = h;
-    console.log(edges);
-    console.log(nodes);
 
     side.appendChild(canvas);
 
@@ -135,29 +133,10 @@ function generateNetworkCanvas(edges, nodes, selection) {
             ctx.strokeStyle = "#000"
             ctx.strokeRect(popupX, popupY, popupSize, 36);
             ctx.fillStyle = "#000";
-            ctx.fillText(extractName(d.email) + " | " + d.employeeID, popupX + 2, popupY + 10);
+            ctx.fillText(d.name + " | " + d.employeeID, popupX + 2, popupY + 10);
             ctx.fillText(d.jobTitle, popupX + 2, popupY + 20);
             ctx.fillText(d.email, popupX + 2, popupY + 30);
         }
-    }
-
-    function extractName(email) {
-        // Splice off the email server
-        var nameBuilder = email.substring(0, email.indexOf("@"));
-        // Split mail into seperate names
-        nameBuilder = nameBuilder.split(".");
-        // Initialize surnames and capitalize
-        var name = "";
-        for (var i = 0; i < nameBuilder.length; i++) {
-            if (nameBuilder[i] != null && nameBuilder[i].length > 0) {
-                if (i < nameBuilder.length-1) {
-                    name = name + nameBuilder[i][0].toUpperCase() + ".";
-                } else {
-                    name = name + " " + nameBuilder[i][0].toUpperCase() + nameBuilder[i].substring(1);
-                }
-            }
-        }
-        return name
     }
 
     function color() {
@@ -208,7 +187,7 @@ function generateNetworkCanvas(edges, nodes, selection) {
             .on("end", dragEnded)
         }
 
-    console.log(zooming)
+    console.log(zooming);
     
     return d3.select(ctx.canvas).call(dragNodes(simulation)).node();
 }

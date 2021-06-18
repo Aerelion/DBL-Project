@@ -59,12 +59,12 @@
       type="range"
       min="1"
       max="100"
-      value="50"
+      value="0"
       class="slider"
       id="range"
       @input="showRangeValue"
     />
-    <p id="rangeValue">test</p>
+    <p id="rangeValue"></p>
   </div>
 </template>
 
@@ -122,6 +122,24 @@ export default {
 
       document.getElementById("rangeValue").innerHTML = displayDate;
     },
+    extractName(email) {
+        // Splice off the email server
+        var nameBuilder = email.substring(0, email.indexOf("@"));
+        // Split mail into seperate names
+        nameBuilder = nameBuilder.split(".");
+        // Initialize surnames and capitalize
+        var name = "";
+        for (var i = 0; i < nameBuilder.length; i++) {
+            if (nameBuilder[i] != null && nameBuilder[i].length > 0) {
+                if (i < nameBuilder.length-1) {
+                    name = name + nameBuilder[i][0].toUpperCase() + ".";
+                } else {
+                    name = name + " " + nameBuilder[i][0].toUpperCase() + nameBuilder[i].substring(1);
+                }
+            }
+        }
+        return name
+    },
     showDatabaseEntries(name, link) {
       // this will maybe be needed for the animation
       // function sleep(ms) {
@@ -141,7 +159,7 @@ export default {
       header.innerHTML = "Dataset-" + ++this.datasetNo;
       _name.innerHTML = "Name of the dataset: " + name;
       _visualise.innerHTML = "Visualise";
-      _visualise.onclick = async () => {
+      _visualise.onclick  = async () => {
         var visDiv = document.getElementById(
           document.getElementById("testSelectNL").value
         );
@@ -152,7 +170,7 @@ export default {
         );
         visDiv.innerHTML = "";
         const response = await fetch(link);
-        const data = d3.csvParse(await response.text(), d3.autoType);
+        var data = d3.csvParse(await response.text(), d3.autoType);
 
         var edges = [];
         var nodes = [];
@@ -189,7 +207,13 @@ export default {
 
           document.getElementById("range").max = maxDate.getTime();
           document.getElementById("range").min = minDate.getTime();
+          // document.getElementById("range").value = (maxDate.getTime()+minDate.getTime())/2;
+
         })();
+
+        this.showRangeValue();  // display date right after pressing visualise
+
+        data=data.filter((x) => {return x.date<=document.getElementById("range").value;});  // filter out datapoints given the slider
 
         data.forEach((x) => {
           var objNodesTo = {};
@@ -199,6 +223,7 @@ export default {
           if (index === -1) {
             objNodesFrom["employeeID"] = x.fromId;
             objNodesFrom["email"] = x.fromEmail;
+            objNodesFrom["name"]=this.extractName(x.fromEmail);
             objNodesFrom["jobTitle"] = x.fromJobtitle;
             nodes.push(objNodesFrom);
 
@@ -210,6 +235,7 @@ export default {
           if (index2 === -1) {
             objNodesTo["employeeID"] = x.toId;
             objNodesTo["email"] = x.toEmail;
+            objNodesTo["name"]=this.extractName(x.toEmail);
             objNodesTo["jobTitle"] = x.toJobtitle;
             nodes.push(objNodesTo);
 
@@ -256,13 +282,6 @@ export default {
           });
         });
         
-        data.forEach((x) => {
-          if(x.date > document.getElementById("range").value) {
-            edges.splice(edges.indexOf(x), 1)
-            // wEdges.splice(wEdges.indexOf(x), 1)
-          }
-        });
-        console.log(edges);
         generateNetworkCanvas(edges, nodes, selection);
         generateMatrix(wEdges, nodes, edgeWeights);
       };

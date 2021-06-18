@@ -6,12 +6,11 @@ function generateMatrix(edges, nodes, edgeWeights) {
   var w = document.getElementById("viscontent").clientWidth;
   var h = document.getElementById("viscontent").clientHeight;
 
-  console.log(nodes);
-
-  const minOpacity = 0.3; // opacity of an edge with weight 1
+  const textLength=12;                                                        // change this to the approx max node text length
+  const minOpacity = 0.3;                                                     // opacity of an edge with weight 1
   const logCoefficient = (1 - minOpacity) / Math.log2(edgeWeights.maxWeight); // coeficient that is used to calculate opacity
-  const squareSize = Math.floor(h / nodes.length) - 1;
-  const textSpace = squareSize * 5; //NOTE: still have to improve this, so that text doesn't go out of the screen when rendering
+  const squareSize = Math.floor(h / (nodes.length+textLength)) - 1;           // the edge side length
+  const textSpace = squareSize * textLength;                                  // approx space allocated for text (important only to center the visualisation when rendering)
 
   // nodePositions is an object that stores the positions where the nodes should be displayed in the adj matrix
   var nodePositions = {};
@@ -20,6 +19,7 @@ function generateMatrix(edges, nodes, edgeWeights) {
     nodePositions[position] = i;
   }
 
+  // every svg component goes in here
   var svg = d3
     .select('#' + side)
     .append("svg")
@@ -32,6 +32,7 @@ function generateMatrix(edges, nodes, edgeWeights) {
     )
     .append("g");
 
+  // the grid of edges
   var grid = svg.append("g").attr("id", "grid");
     grid.selectAll("rect")
     .data(edges)
@@ -48,8 +49,8 @@ function generateMatrix(edges, nodes, edgeWeights) {
     .attr("fill", "white")
     .style("opacity", ((d) => { return (Math.log2(d.weight) * logCoefficient) + minOpacity }));  // this makes it so that overlayed rectangles can be seen (kind of adds weights to the edges)
 
-  var textLeft = svg.append("g").attr("id", "textLeft");
-  var textUp = svg.append("g").attr("id", "textUp");
+  var textLeft = svg.append("g").attr("id", "textLeft");  // the text nodes on the left side of the grid
+  var textUp = svg.append("g").attr("id", "textUp");      // the text nodes on top of the grid
 
   textLeft.selectAll("text")
     .data(nodes)
@@ -61,7 +62,7 @@ function generateMatrix(edges, nodes, edgeWeights) {
       return (nodePositions[(d.employeeID).toString()]*squareSize) + textSpace + (squareSize*0.75);
     })
     .text((d) => {
-      return d.email;
+      return d.name;
     })
     .style("fill", "white")
     .style("font-size", squareSize);
@@ -77,13 +78,10 @@ function generateMatrix(edges, nodes, edgeWeights) {
       return -((nodePositions[(d.employeeID).toString()]*squareSize) + textSpace + (squareSize*0.25));
     })
     .text((d) => {
-      return d.email;
+      return d.name;
     })
     .style("fill", "white")
     .style("font-size", squareSize);
-
-  console.log(textLeft, textUp);
-  console.log(grid.nodes());
 }
 
 export default generateMatrix
