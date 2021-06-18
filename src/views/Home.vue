@@ -143,7 +143,6 @@ export default {
         }
         return name
     },
-    showDatabaseEntries(name, link) {
     showDatabaseEntries(name) {
       // this will maybe be needed for the animation
       // function sleep(ms) {
@@ -161,8 +160,6 @@ export default {
       header.innerHTML = "Dataset-" + ++this.datasetNo;
       _name.innerHTML = "Name of the dataset: " + name;
       _visualise.innerHTML = "Visualise";
-      _visualise.onclick  = async () => {
-        var visDiv = document.getElementById(
       _visualise.onclick = async () => {
         
         this.update()
