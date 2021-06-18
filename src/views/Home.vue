@@ -123,6 +123,7 @@ export default {
       document.getElementById("rangeValue").innerHTML = displayDate;
     },
     showDatabaseEntries(name, link) {
+      // this will maybe be needed for the animation
       // function sleep(ms) {
       //   return new Promise(
       //     resolve => setTimeout(resolve, ms)
@@ -377,9 +378,9 @@ export default {
   position: absolute;
   top: 0;
   right: 25px;
-  font-size: 36px;
+  font-size: 35px;
   margin-left: 50px;
-  padding: 8px 8px 8px 32px;
+  padding: 8px;
   text-decoration: none;
   color: #818181;
   display: block;
@@ -398,9 +399,9 @@ export default {
 .openbtn:hover {
   color: black;
   background-color: #42b983;
+  transition: 0.3s;
 }
 
-/* Push page content to the right */
 .sidebarButton {
   position: absolute;
   transition: margin-left 0.5s;
