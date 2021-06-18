@@ -63,6 +63,7 @@
       class="slider"
       id="range"
       @input="showRangeValue"
+      @change="update"
     />
     <p id="rangeValue"></p>
   </div>
@@ -75,6 +76,8 @@ import { db } from "../main";
 //import generateNetwork from "../visualisations/nodelink";
 import generateMatrix from "../visualisations/adjacencymatrix";
 import generateNetworkCanvas from "../visualisations/nodelinkv2.0";
+
+var link
 
 export default {
   name: "Home",
@@ -141,6 +144,7 @@ export default {
         return name
     },
     showDatabaseEntries(name, link) {
+    showDatabaseEntries(name) {
       // this will maybe be needed for the animation
       // function sleep(ms) {
       //   return new Promise(
@@ -152,8 +156,6 @@ export default {
       var ul = document.getElementById("list");
       var header = document.createElement("h2");
 
-      var selection = null;
-
       var _name = document.createElement("li");
       var _visualise = document.createElement("button");
       header.innerHTML = "Dataset-" + ++this.datasetNo;
@@ -161,6 +163,30 @@ export default {
       _visualise.innerHTML = "Visualise";
       _visualise.onclick  = async () => {
         var visDiv = document.getElementById(
+      _visualise.onclick = async () => {
+        
+        this.update()
+      };
+      ul.appendChild(header);
+      ul.appendChild(_name);
+      ul.appendChild(_visualise);
+    },
+
+    getAllDatabaseEntries() {
+      db.collection("datasets")
+        .get()
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            let name = doc.data().dataName;
+            link = doc.data().fileLink;
+            this.showDatabaseEntries(name, link);
+          });
+        });
+    },
+
+    async update() {
+      var selection = null;
+      var visDiv = document.getElementById(
           document.getElementById("testSelectNL").value
         );
         visDiv.innerHTML = "";
@@ -284,22 +310,6 @@ export default {
         
         generateNetworkCanvas(edges, nodes, selection);
         generateMatrix(wEdges, nodes, edgeWeights);
-      };
-      ul.appendChild(header);
-      ul.appendChild(_name);
-      ul.appendChild(_visualise);
-    },
-
-    getAllDatabaseEntries() {
-      db.collection("datasets")
-        .get()
-        .then((snapshot) => {
-          snapshot.forEach((doc) => {
-            let name = doc.data().dataName;
-            let link = doc.data().fileLink;
-            this.showDatabaseEntries(name, link);
-          });
-        });
     },
 
     openBar() {
