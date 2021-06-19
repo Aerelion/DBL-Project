@@ -62,6 +62,7 @@
       value="0"
       class="slider"
       id="range"
+      style="display: none;"
       @input="showRangeValue"
       @change="update"
     />
@@ -78,6 +79,8 @@ import generateMatrix from "../visualisations/adjacencymatrix";
 import generateNetworkCanvas from "../visualisations/nodelinkv2.0";
 
 var link
+var minDate
+var maxDate
 
 export default {
   name: "Home",
@@ -145,11 +148,7 @@ export default {
     },
     showDatabaseEntries(name) {
       // this will maybe be needed for the animation
-      // function sleep(ms) {
-      //   return new Promise(
-      //     resolve => setTimeout(resolve, ms)
-      //   );
-      // }
+
 
 
       var ul = document.getElementById("list");
@@ -161,8 +160,9 @@ export default {
       _name.innerHTML = "Name of the dataset: " + name;
       _visualise.innerHTML = "Visualise";
       _visualise.onclick = async () => {
-        
+        document.getElementById("range").style.display = "inline"
         this.update()
+        //this.animate()
       };
       ul.appendChild(header);
       ul.appendChild(_name);
@@ -180,6 +180,20 @@ export default {
           });
         });
     },
+
+    // async animate() {
+    //   function sleep(ms) {
+    //     return new Promise(
+    //       resolve => setTimeout(resolve, ms)
+    //     );
+    //   }
+    //   var skip = 7 // how many days per step
+    //   for (var d = new Date(1999, 0, 1); d <= document.getElementById("range").max; d.setDate(d.getDate() + skip)) {
+    //     document.getElementById("range").value = d.getTime()
+    //     await this.update();
+    //     await sleep(2000);
+    //   }
+    // },
 
     async update() {
       var selection = null;
@@ -213,8 +227,8 @@ export default {
         // the purpose of this function is to calculate the minDate and the maxDate of the given dataset
         (function () {
 
-          var maxDate = new Date(-3155692597470);
-          var minDate = new Date(3155692597470);
+          maxDate = new Date(-3155692597470);
+          minDate = new Date(3155692597470);
 
           data.forEach((x) => {
             // check if current date is larger than maxDate
