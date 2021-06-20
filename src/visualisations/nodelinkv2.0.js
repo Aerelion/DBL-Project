@@ -10,6 +10,8 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
 
     canvas.width = w;
     canvas.height = h;
+    var boundDistance = Math.min(w / 2, h / 2);
+    var boundDistanceSquared = Math.pow(boundDistance, 2);
 
     side.appendChild(canvas);
 
@@ -70,8 +72,15 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
 
     
     function constrainNode(node) {
-        node.x = Math.min(w-6, Math.max(2, node.x));
-        node.y = Math.min(h-130, Math.max(2, node.y));
+        var distanceFromCenterSquared = Math.pow(node.x - w/2, 2) + Math.pow(node.y - h/2, 2);
+        if (distanceFromCenterSquared > boundDistanceSquared) {
+            var distanceFromCenter = Math.sqrt(distanceFromCenterSquared);
+            console.log(distanceFromCenter);
+            node.x = ((node.x - w/2) / distanceFromCenter) * boundDistance + w/2;
+            node.y = ((node.y - h/2) / distanceFromCenter) * boundDistance + h/2;
+        }
+        //node.x = Math.min(w-6, Math.max(2, node.x));
+        //node.y = Math.min(h-130, Math.max(2, node.y));
     } 
 
     function drawEdges(edges) {
