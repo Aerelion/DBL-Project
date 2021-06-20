@@ -2,7 +2,7 @@ import * as d3 from "d3";
 
 
 
-function generateNetworkCanvas(edges, nodes, selection) {
+function generateNetworkCanvas(edges, nodes, selectedNode) {
     var side = document.getElementById(document.getElementById("testSelectNL").value);
     var canvas = document.createElement('canvas');
     var w = document.getElementById("viscontent").clientWidth;
@@ -49,7 +49,7 @@ function generateNetworkCanvas(edges, nodes, selection) {
         for (const node of nodes) {
             constrainNode(node);
             // Change selected node to stand out
-            if (node == selection) {
+            if (node.employeeID == selectedNode[0]) {
                 ctx.strokeStyle = "#000";
                 ctx.fillStyle = "#ff0000";
             } else if (neighbours.indexOf(node) >= 0) {
@@ -65,7 +65,7 @@ function generateNetworkCanvas(edges, nodes, selection) {
             ctx.fill();
             ctx.stroke();
         }
-        drawNodeInformation(selection);
+        drawSelectionInformation(selectedNode[0]);
     }
 
     
@@ -78,17 +78,17 @@ function generateNetworkCanvas(edges, nodes, selection) {
         var selectionEdges = [];
         var normalEdges = [];
         var neighbours = [];
-        if (selection == null) {
+        if (selectedNode[0] == null) {
             ctx.beginPath();
             edges.forEach(drawEdge);
             ctx.strokeStyle = "#aaa";
             ctx.stroke();
         } else {
             for (const edge of edges) {
-                if (edge.source.employeeID == selection.employeeID) {
+                if (edge.source.employeeID == selectedNode[0]) {
                     selectionEdges.push(edge);
                     neighbours.push(edge.target);
-                } else if (edge.target.employeeID == selection.employeeID) {
+                } else if (edge.target.employeeID == selectedNode[0]) {
                     selectionEdges.push(edge);
                     neighbours.push(edge.source);
                 } else {
@@ -122,6 +122,14 @@ function generateNetworkCanvas(edges, nodes, selection) {
         //ctx.fillText("ID: " + d.employeeID, d.x+10, d.y+3);
     }
 
+    function drawSelectionInformation(id) {
+        for (const node of nodes) {
+            if (id == node.employeeID) {
+                drawNodeInformation(node);
+                break;
+            }
+        }
+    }
     function drawNodeInformation(d) {
         if (d != null) {
             var popupX = d.x + 10;
@@ -152,7 +160,7 @@ function generateNetworkCanvas(edges, nodes, selection) {
 
     function onClick(event) {
         console.log(event.subject);
-        selection = event.subject;
+        selectedNode[0] = event.subject.employeeID;
     }
 
     function dragNodes(simulation) {

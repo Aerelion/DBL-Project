@@ -81,6 +81,7 @@ import generateNetworkCanvas from "../visualisations/nodelinkv2.0";
 var link
 var minDate
 var maxDate
+var selectedNodes = {};
 
 export default {
   name: "Home",
@@ -128,6 +129,7 @@ export default {
 
       document.getElementById("rangeValue").innerHTML = displayDate;
     },
+
     extractName(email) {
         // Splice off the email server
         var nameBuilder = email.substring(0, email.indexOf("@"));
@@ -148,12 +150,8 @@ export default {
     },
     showDatabaseEntries(name) {
       // this will maybe be needed for the animation
-
-
-
       var ul = document.getElementById("list");
       var header = document.createElement("h2");
-
       var _name = document.createElement("li");
       var _visualise = document.createElement("button");
       header.innerHTML = "Dataset-" + ++this.datasetNo;
@@ -176,7 +174,7 @@ export default {
           snapshot.forEach((doc) => {
             let name = doc.data().dataName;
             link = doc.data().fileLink;
-            this.showDatabaseEntries(name, link);
+            this.showDatabaseEntries(name);
           });
         });
     },
@@ -196,7 +194,6 @@ export default {
     // },
 
     async update() {
-      var selection = null;
       var visDiv = document.getElementById(
           document.getElementById("testSelectNL").value
         );
@@ -319,7 +316,7 @@ export default {
           });
         });
         
-        generateNetworkCanvas(edges, nodes, selection);
+        generateNetworkCanvas(edges, nodes, selectedNodes);
         generateMatrix(wEdges, nodes, edgeWeights);
     },
 
