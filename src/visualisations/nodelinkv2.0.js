@@ -75,7 +75,7 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
         var distanceFromCenterSquared = Math.pow(node.x - w/2, 2) + Math.pow(node.y - h/2, 2);
         if (distanceFromCenterSquared > boundDistanceSquared) {
             var distanceFromCenter = Math.sqrt(distanceFromCenterSquared);
-            console.log(distanceFromCenter);
+            //console.log(distanceFromCenter);
             node.x = ((node.x - w/2) / distanceFromCenter) * boundDistance + w/2;
             node.y = ((node.y - h/2) / distanceFromCenter) * boundDistance + h/2;
         }

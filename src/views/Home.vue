@@ -78,9 +78,11 @@ import { db } from "../main";
 import generateMatrix from "../visualisations/adjacencymatrix";
 import generateNetworkCanvas from "../visualisations/nodelinkv2.0";
 
-var link
-var minDate
-var maxDate
+var link = [];
+var linkEntry = -1;
+var visLink;
+var minDate;
+var maxDate;
 var selectedNodes = {};
 
 export default {
@@ -149,15 +151,18 @@ export default {
         return name
     },
     showDatabaseEntries(name) {
-      // this will maybe be needed for the animation
       var ul = document.getElementById("list");
       var header = document.createElement("h2");
       var _name = document.createElement("li");
       var _visualise = document.createElement("button");
+      var help = linkEntry;
       header.innerHTML = "Dataset-" + ++this.datasetNo;
       _name.innerHTML = "Name of the dataset: " + name;
       _visualise.innerHTML = "Visualise";
       _visualise.onclick = async () => {
+        visLink = link[help];
+        console.log(visLink);
+        console.log(link);
         document.getElementById("range").style.display = "inline"
         this.update()
         //this.animate()
@@ -172,8 +177,9 @@ export default {
         .get()
         .then((snapshot) => {
           snapshot.forEach((doc) => {
+            linkEntry++;
             let name = doc.data().dataName;
-            link = doc.data().fileLink;
+            link[linkEntry] = doc.data().fileLink;
             this.showDatabaseEntries(name);
           });
         });
@@ -203,7 +209,7 @@ export default {
           document.getElementById("testSelectAM").value
         );
         visDiv.innerHTML = "";
-        const response = await fetch(link);
+        const response = await fetch(visLink);
         var data = d3.csvParse(await response.text(), d3.autoType);
 
         var edges = [];
