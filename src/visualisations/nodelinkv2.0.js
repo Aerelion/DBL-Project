@@ -7,6 +7,7 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
     var canvas = document.createElement('canvas');
     var w = document.getElementById("viscontent").clientWidth;
     var h = document.getElementById("viscontent").clientHeight;
+    var oldSelection = null;
 
     canvas.width = w;
     canvas.height = h;
@@ -75,7 +76,6 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
         var distanceFromCenterSquared = Math.pow(node.x - w/2, 2) + Math.pow(node.y - h/2, 2);
         if (distanceFromCenterSquared > boundDistanceSquared) {
             var distanceFromCenter = Math.sqrt(distanceFromCenterSquared);
-            //console.log(distanceFromCenter);
             node.x = ((node.x - w/2) / distanceFromCenter) * boundDistance + w/2;
             node.y = ((node.y - h/2) / distanceFromCenter) * boundDistance + h/2;
         }
@@ -160,8 +160,16 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
         var scale = d3.scaleOrdinal(d3.schemeCategory10);
         return d => scale(d.group);
     }
-    
 
+    // Update loop seperate from the tick function, thus not controlled by D3
+    function heartBeat() {
+        if (simulation.alpha() < 0.01 && oldSelection != selectedNode[0]) {
+            console.log("Attempting wakeup");
+            simulation.alpha(0.01).restart();
+            oldSelection = selectedNode[0];
+        }
+    }
+    
     function zooming(event) {
       transform = event.transform;
       ticked();
@@ -206,6 +214,7 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
 
     console.log(zooming);
     
+    setInterval(function() { heartBeat(); }, 500); // Check for updates every 500 ms
     return d3.select(ctx.canvas).call(dragNodes(simulation)).node();
 }
 
