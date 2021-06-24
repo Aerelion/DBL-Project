@@ -6,11 +6,12 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
     var side = document.getElementById(document.getElementById("testSelectNL").value);
     var canvas = document.createElement('canvas');
     var w = document.getElementById("viscontent").clientWidth;
-    var h = document.getElementById("viscontent").clientHeight;
+    var h = document.getElementById("viscontent").clientHeight - 130;
     var oldSelection = null;
 
     canvas.width = w;
     canvas.height = h;
+    // Creates a circle bound with diameter of the smallest of either the width or height of the window.
     var boundDistance = Math.min(w / 2, h / 2);
     var boundDistanceSquared = Math.pow(boundDistance, 2);
 
