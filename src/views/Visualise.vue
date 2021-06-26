@@ -380,10 +380,12 @@ export default {
 
 <style scoped>
 .visGrid {
+  overflow: hidden;
   position: absolute;
   display: grid;
   width: 100%;
-  height: 100%;
+  bottom: 0;
+  top: 0;
   background-color: #3f3f3f;
   grid-template-columns: 1fr 1fr;
   color: white;
@@ -396,6 +398,7 @@ export default {
   height: 100%;
   width: 100%;
   transition: margin-left 0.5s;
+  margin-top: 9%;
 }
 
 .sidebar {

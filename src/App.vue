@@ -5,7 +5,7 @@
   </div>
   <div id="nav">
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <router-link to="/visualise">Visualise</router-link>
   </div>
   <router-view />
 </template>
@@ -23,7 +23,6 @@
   padding: 0;
   margin: 0;
   border: 0;
-  overflow: hidden;
 }
 
 #nav {
