@@ -224,7 +224,9 @@ export default {
         };
 
         // weighted edges (maybe we will replace edges with this, as it adds weights to edges and also should improve performance)
+        // a copy is required since generateNetworkCanvas modifies the wEdges parameter
         var wEdges = [];
+        var wEdgesCopy = [];
 
         // this function auto-executes whenever visualise is clicked
         // the purpose of this function is to calculate the minDate and the maxDate of the given dataset
@@ -315,16 +317,21 @@ export default {
         Object.keys(edgeWeights.weight).forEach((fromId) => {
           Object.keys(edgeWeights.weight[fromId]).forEach((toId) => {
             let objEdges = {};
-            objEdges["source"] = fromId;
-            objEdges["target"] = toId;
+            let objEdgesCopy = {};
+            objEdges["source"] = parseInt(fromId);
+            objEdges["target"] = parseInt(toId);
             objEdges["weight"] = edgeWeights.weight[fromId][toId];
+            objEdgesCopy["source"] = parseInt(fromId);
+            objEdgesCopy["target"] = parseInt(toId);
+            objEdgesCopy["weight"] = edgeWeights.weight[fromId][toId];
+
             wEdges.push(objEdges);
+            wEdgesCopy.push(objEdgesCopy);
           });
         });
-        
-        console.log(selectedNodes);
-        generateNetworkCanvas(edges, nodes, selectedNodes);
-        generateMatrix(wEdges, nodes, edgeWeights, selectedNodes);
+
+        generateNetworkCanvas(wEdges, nodes, edgeWeights, selectedNodes);
+        generateMatrix(wEdgesCopy, nodes, edgeWeights, selectedNodes);
     },
 
     openBar() {

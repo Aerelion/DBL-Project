@@ -2,12 +2,16 @@ import * as d3 from "d3";
 
 
 
-function generateNetworkCanvas(edges, nodes, selectedNode) {
+function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
     var side = document.getElementById(document.getElementById("testSelectNL").value);
     var canvas = document.createElement('canvas');
     var w = document.getElementById("viscontent").clientWidth;
     var h = document.getElementById("viscontent").clientHeight - 130;
     var oldSelection = null;
+
+    const minWidth = 0.01;                                                              // width of an edge with weight 1
+    const maxWidth = 2;                                                                // width of largest edge
+    const logCoefficient = (maxWidth - minWidth) / Math.log10(edgeWeights.maxWeight);  // coeficient that is used to calculate opacity
 
     canvas.width = w;
     canvas.height = h;
@@ -21,30 +25,29 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
     ctx.strokeStyle = "red"
     ctx.lineWidth = 0.1;
 
-
     var transform = d3.zoomIdentity;
-    
+
     var simulation = d3 //done
-    .forceSimulation(nodes)
-    .force(
-        "charge", 
-        d3.forceManyBody()
-            .strength(-50)
-            .distanceMax(200))
-    .force(
-      "link",
-      d3
-        .forceLink()
-        .id(function (d) {
-          return d.employeeID;
-        })
-        .links(edges)
-    )
-    .force("center", d3.forceCenter(w / 2, h / 2))
-    .on("tick", ticked);
+        .forceSimulation(nodes)
+        .force(
+            "charge",
+            d3.forceManyBody()
+                .strength(-50)
+                .distanceMax(200))
+        .force(
+            "link",
+            d3
+                .forceLink()
+                .id(function (d) {
+                    return d.employeeID;
+                })
+                .links(edges)
+        )
+        .force("center", d3.forceCenter(w / 2, h / 2))
+        .on("tick", ticked);
 
     function ticked() {
-        ctx.clearRect(0,0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.translate(transform.x, transform.y);
         ctx.scale(transform.k, transform.k);
 
@@ -64,7 +67,7 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
                 ctx.fillStyle = "#000";
             }
             ctx.beginPath();
-            drawNode(node) 
+            drawNode(node)
             ctx.fillStyle = color(node);
             ctx.fill();
             ctx.stroke();
@@ -72,27 +75,27 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
         drawSelectionInformation(selectedNode[0]);
     }
 
-    
+
     function constrainNode(node) {
-        var distanceFromCenterSquared = Math.pow(node.x - w/2, 2) + Math.pow(node.y - h/2, 2);
+        var distanceFromCenterSquared = Math.pow(node.x - w / 2, 2) + Math.pow(node.y - h / 2, 2);
         if (distanceFromCenterSquared > boundDistanceSquared) {
             var distanceFromCenter = Math.sqrt(distanceFromCenterSquared);
-            node.x = ((node.x - w/2) / distanceFromCenter) * boundDistance + w/2;
-            node.y = ((node.y - h/2) / distanceFromCenter) * boundDistance + h/2;
+            node.x = ((node.x - w / 2) / distanceFromCenter) * boundDistance + w / 2;
+            node.y = ((node.y - h / 2) / distanceFromCenter) * boundDistance + h / 2;
         }
         //node.x = Math.min(w-6, Math.max(2, node.x));
         //node.y = Math.min(h-130, Math.max(2, node.y));
-    } 
+    }
 
     function drawEdges(edges) {
         var selectionEdges = [];
         var normalEdges = [];
         var neighbours = [];
         if (selectedNode[0] == null) {
-            ctx.beginPath();
+            // ctx.beginPath();
             edges.forEach(drawEdge);
-            ctx.strokeStyle = "#aaa";
-            ctx.stroke();
+            // ctx.strokeStyle = "#aaa";
+            // ctx.stroke();
         } else {
             for (const edge of edges) {
                 if (edge.source.employeeID == selectedNode[0]) {
@@ -120,15 +123,24 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
     }
 
     function drawEdge(d) {
+        ctx.beginPath();
         ctx.moveTo(d.source.x, d.source.y);
         ctx.lineTo(d.target.x, d.target.y);
+        ctx.lineWidth=(Math.log10(d.weight) * logCoefficient) + minWidth;
+        // ctx.lineWidth = d.weight / edgeWeights.maxWeight;
+        ctx.strokeStyle = "#aaa";
+        ctx.stroke();
         //ctx.fillText(d.sentiment, ((d.source.x + d.target.x) / 2) + 10 , ((d.source.y + d.target.y) / 2) + 3);
         //console.log(d.sentiment)
     }
 
     function drawNode(d) {
+        // ctx.beginPath();
         ctx.moveTo(d.x, d.y);
         ctx.arc(d.x, d.y, 3, 0, 2 * Math.PI);
+        // ctx.fillStyle = color(d);
+        // ctx.fill();
+        // ctx.stroke();
         //ctx.fillText("ID: " + d.employeeID, d.x+10, d.y+3);
     }
 
@@ -170,10 +182,10 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
             oldSelection = selectedNode[0];
         }
     }
-    
+
     function zooming(event) {
-      transform = event.transform;
-      ticked();
+        transform = event.transform;
+        ticked();
     }
 
     function onClick(event) {
@@ -188,34 +200,34 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
 
         // Use dragStart event to hack in clickability in HTML canvas
         function dragStarted(event) {
-          onClick(event);
+            onClick(event);
 
-          if (!event.active) simulation.alphaTarget(0.3).restart();
-          event.subject.fx = event.subject.x;
-          event.subject.fy = event.subject.y;
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            event.subject.fx = event.subject.x;
+            event.subject.fy = event.subject.y;
         }
-        
+
         function dragged(event) {
-          event.subject.fx = event.x;
-          event.subject.fy = event.y;
+            event.subject.fx = event.x;
+            event.subject.fy = event.y;
         }
-        
+
         function dragEnded(event) {
-          if (!event.active) simulation.alphaTarget(0);
-          event.subject.fx = null;
-          event.subject.fy = null;
+            if (!event.active) simulation.alphaTarget(0);
+            event.subject.fx = null;
+            event.subject.fy = null;
         }
-        
+
         return d3.drag()
             .subject(dragSubject)
             .on("start", dragStarted)
             .on("drag", dragged)
             .on("end", dragEnded)
-        }
+    }
 
     console.log(zooming);
-    
-    setInterval(function() { heartBeat(); }, 50); // Check for updates every 500 ms
+
+    setInterval(function () { heartBeat(); }, 50); // Check for updates every 500 ms
     return d3.select(ctx.canvas).call(dragNodes(simulation)).node();
 }
 
