@@ -215,7 +215,7 @@ function generateNetworkCanvas(edges, nodes, selectedNode) {
 
     console.log(zooming);
     
-    setInterval(function() { heartBeat(); }, 500); // Check for updates every 500 ms
+    setInterval(function() { heartBeat(); }, 50); // Check for updates every 500 ms
     return d3.select(ctx.canvas).call(dragNodes(simulation)).node();
 }
 

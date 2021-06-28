@@ -83,7 +83,7 @@ var linkEntry = -1;
 var visLink;
 var minDate;
 var maxDate;
-var selectedNodes = {};
+var selectedNodes = [];
 
 export default {
   name: "Home",
@@ -322,8 +322,9 @@ export default {
           });
         });
         
+        console.log(selectedNodes);
         generateNetworkCanvas(edges, nodes, selectedNodes);
-        generateMatrix(wEdges, nodes, edgeWeights);
+        generateMatrix(wEdges, nodes, edgeWeights, selectedNodes);
     },
 
     openBar() {
