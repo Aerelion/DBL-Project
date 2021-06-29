@@ -39,6 +39,13 @@
     </div>
     --></div>
 
+    <div class="skipSelection">
+      <h3>Select days between animation steps</h3>
+      <p>Please select a value between 1 and 365</p>
+      <br>
+      <input type="number" id="numberInput" min="1" max="365" value="7">
+    </div>
+
     <div class="dataList">
       <ul id="list" class="column"></ul>
     </div>
@@ -66,7 +73,9 @@
       @input="showRangeValue"
       @change="update"
     />
+    <br>
     <p id="rangeValue"></p>
+    <button id="animationbtn" @click="animate" style="font-size: 20px;">Start animation</button>
   </div>
 </template>
 
@@ -84,6 +93,7 @@ var visLink;
 var minDate;
 var maxDate;
 var selectedNodes = [];
+var clickCounter = 0;
 
 export default {
   name: "Home",
@@ -163,7 +173,8 @@ export default {
         visLink = link[help];
         console.log(visLink);
         console.log(link);
-        document.getElementById("range").style.display = "inline"
+        document.getElementById("range").style.display = "inline";
+        document.getElementById("animationbtn").style.display = "initial";
         this.update()
         //this.animate()
       };
@@ -185,19 +196,33 @@ export default {
         });
     },
 
-    // async animate() {
-    //   function sleep(ms) {
-    //     return new Promise(
-    //       resolve => setTimeout(resolve, ms)
-    //     );
-    //   }
-    //   var skip = 7 // how many days per step
-    //   for (var d = new Date(1999, 0, 1); d <= document.getElementById("range").max; d.setDate(d.getDate() + skip)) {
-    //     document.getElementById("range").value = d.getTime()
-    //     await this.update();
-    //     await sleep(2000);
-    //   }
-    // },
+    async animate() {
+      function sleep(ms) {
+        return new Promise(
+          resolve => setTimeout(resolve, ms)
+        );
+      }
+
+      var x = document.getElementById("range").value;
+      clickCounter++;
+      if(clickCounter % 2 === 1) {
+        document.getElementById("animationbtn").innerHTML = "&#x23F8;";
+      } else {
+        document.getElementById("animationbtn").innerHTML = "&#x23F5;";
+      }
+      var skip = parseInt(document.getElementById("numberInput").value); // how many days per step
+      for (var d = new Date(parseInt(x)); d.getTime() <= document.getElementById("range").max; d.setDate(d.getDate() + skip)) {
+        if(clickCounter % 2 === 1){
+          document.getElementById("range").value = d.getTime()
+          console.log(skip);
+          await this.update();
+          await sleep(2000);
+          d = new Date(parseInt(document.getElementById("range").value));
+        } else {
+          break;
+        }
+      }
+    },
 
     async update() {
       var visDiv = document.getElementById(
@@ -495,14 +520,34 @@ export default {
   bottom: 0;
   width: 100%;
   background-color: #2c3e50;
-  height: 40px;
+  height: 10%;
 }
 
 .slider {
   width: 80%;
+  position: absolute;
+  top: 3px;
+  left: 10%;
+  justify-content: center;
 }
 
 #rangeValue {
   color: white;
+  margin: 3px;
+}
+
+#animationbtn {
+  margin-top: 3px;
+  display: none;
+}
+
+.skipSelection {
+  padding: 10px;
+  border-bottom: 2px solid white;
+}
+
+#numberInput {
+  height: 30px;
+  font-size: 20px;
 }
 </style>
