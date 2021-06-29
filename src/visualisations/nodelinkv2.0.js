@@ -67,6 +67,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
                 ctx.fillStyle = "#000";
             }
             ctx.beginPath();
+            ctx.lineWidth=1;
             drawNode(node)
             ctx.fillStyle = color(node);
             ctx.fill();
@@ -92,10 +93,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         var normalEdges = [];
         var neighbours = [];
         if (selectedNode[0] == null) {
-            // ctx.beginPath();
             edges.forEach(drawEdge);
-            // ctx.strokeStyle = "#aaa";
-            // ctx.stroke();
         } else {
             for (const edge of edges) {
                 if (edge.source.employeeID == selectedNode[0]) {
