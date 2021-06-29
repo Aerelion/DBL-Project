@@ -157,6 +157,7 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
     .attr("fill", "none")
     .attr("stroke", "orange")
     .attr("stroke-width", strokeSize)
+    .attr("pointer-events", "none")       // this removes event handling from the highlight border
     .style("visibility", "hidden");
 
   highlightUpBorder.selectAll("rect")
@@ -175,31 +176,32 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
     .attr("fill", "none")
     .attr("stroke", "orange")
     .attr("stroke-width", strokeSize)
+    .attr("pointer-events", "none")       // this removes event handling from the highlight border
     .style("visibility", "hidden");
 
   // event handler for clicking on nodes
   text.selectAll("text")
     .on("click", function (e, d) {
-      if (e.ctrlKey) {
-        nodeMS(d.employeeID);
-      } else {
-        nodeSS(d.employeeID);
+      nodeEventHandler(e, d);
+    })
+    .on("mouseover", function (e, d) {
+      if (e.shiftKey) {
+        nodeEventHandler(e, d);
       }
-    });
+    })
 
   // event handler for clicking on edges
   grid.selectAll("rect")
     .on("click", function (e, d) {
-      if (e.ctrlKey) {
-        edgeMS(d.source, d.target);
-      } else {
-        edgeSS(d.source, d.target);
-      }
+      edgeEventHandler(e, d);
     })
     .on("mouseover", function (e, d) {
+      if (e.shiftKey) {
+        edgeEventHandler(e, d);
+      }
+
       var horizontal = d.source;
       var vertical = d.target;
-
       showLines(horizontal, vertical)
     })
     .on("mouseleave", function (e, d) {
@@ -251,13 +253,14 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
     svg.selectAll("rect.vLineHighlightID" + v).style("visibility", "visible");
   }
 
-  // hide lines when mouse leaves edge 
+  // hide lines when mouse leaves edge
+  // local selection is used so that lines don't glich and remain on screen after the mouse leaves
   function hideLines(h, v) {
-    if (globalSelection.indexOf(h) === -1) {
+    if (localSelection.indexOf(h) === -1) {
       svg.selectAll("rect.hLineHighlightID" + h).style("visibility", "hidden");
     }
 
-    if (globalSelection.indexOf(v) === -1) {
+    if (localSelection.indexOf(v) === -1) {
       svg.selectAll("rect.vLineHighlightID" + v).style("visibility", "hidden");
     }
   }
@@ -318,6 +321,22 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
       if (index2 === -1) {
         globalSelection.push(node2);
       }
+    }
+  }
+
+  function nodeEventHandler(e, d) {
+    if (e.ctrlKey) {
+      nodeMS(d.employeeID);
+    } else {
+      nodeSS(d.employeeID);
+    }
+  }
+
+  function edgeEventHandler(e, d) {
+    if (e.ctrlKey) {
+      edgeMS(d.source, d.target);
+    } else {
+      edgeSS(d.source, d.target);
     }
   }
 
