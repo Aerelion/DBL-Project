@@ -50,9 +50,6 @@
       <ul id="list" class="column"></ul>
     </div>
 
-    <div class="QOLbuttons" >
-      <button @click="resetSelection">Remove highlights</button>
-    </div>
   </div>
 
   <div class="sidebarButton">
@@ -82,6 +79,9 @@
     <button id="animationbtn" @click="animate" style="font-size: 20px">
       Start animation
     </button>
+    <div class="QOLbuttons" >
+      <button @click="resetSelection">Remove highlights</button>
+    </div>
   </div>
 </template>
 
@@ -571,5 +571,11 @@ export default {
 #numberInput {
   height: 30px;
   font-size: 20px;
+}
+
+.QOLbuttons {
+  position: absolute;
+  right: 2%;
+  bottom: 40%;
 }
 </style>

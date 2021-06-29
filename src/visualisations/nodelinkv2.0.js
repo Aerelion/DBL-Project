@@ -7,7 +7,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
     var canvas = document.createElement('canvas');
     var w = document.getElementById("viscontent").clientWidth;
     var h = document.getElementById("viscontent").clientHeight - 130;
-    var oldSelection = null;
+    //var oldSelection = null;
 
     const minWidth = 1;                                                              // width of an edge with weight 1
     const maxWidth = 2;                                                                // width of largest edge
@@ -177,13 +177,13 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
     }
 
     // Update loop seperate from the tick function, thus not controlled by D3
-    function heartBeat() {
-        if (simulation.alpha() < 0.01 && oldSelection != selectedNode[0]) {
-            console.log("Attempting wakeup");
-            simulation.alpha(0.01).restart();
-            oldSelection = selectedNode[0];
-        }
-    }
+    // function heartBeat() {
+    //     if (simulation.alpha() < 0.01 && oldSelection != selectedNode[0]) {
+    //         console.log("Attempting wakeup");
+    //         simulation.alpha(0.01).restart();
+    //         oldSelection = selectedNode[0];
+    //     }
+    // }
 
     function zooming(event) {
         transform = event.transform;
@@ -229,7 +229,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
 
     console.log(zooming);
 
-    setInterval(function () { heartBeat(); }, 50); // Check for updates every 500 ms
+    //setInterval(function () { heartBeat(); }, 50); // Check for updates every 500 ms
     return d3.select(ctx.canvas).call(dragNodes(simulation)).node();
 }
 
