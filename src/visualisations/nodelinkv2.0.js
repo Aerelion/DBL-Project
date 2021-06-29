@@ -9,9 +9,10 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
     var h = document.getElementById("viscontent").clientHeight - 130;
     var oldSelection = null;
 
-    const minWidth = 0.01;                                                              // width of an edge with weight 1
+    const minWidth = 1;                                                              // width of an edge with weight 1
     const maxWidth = 2;                                                                // width of largest edge
-    const logCoefficient = (maxWidth - minWidth) / Math.log10(edgeWeights.maxWeight);  // coeficient that is used to calculate opacity
+    const logCoefficient = (maxWidth - minWidth) / Math.log10(edgeWeights.maxWeight); 
+    const logCoefficient2 = (10 - minWidth) / Math.log2(edgeWeights.maxWeight); // coeficient that is used to calculate opacity
 
     canvas.width = w;
     canvas.height = h;
@@ -42,6 +43,10 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
                     return d.employeeID;
                 })
                 .links(edges)
+                .strength(function (edge) {
+                    console.log(edge)
+                    return ((Math.log2(edge.weight) * logCoefficient2) + minWidth) / edgeWeights.maxWeight;
+                })
         )
         .force("center", d3.forceCenter(w / 2, h / 2))
         .on("tick", ticked);
@@ -92,6 +97,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         var selectionEdges = [];
         var normalEdges = [];
         var neighbours = [];
+
         if (selectedNode[0] == null) {
             edges.forEach(drawEdge);
         } else {
