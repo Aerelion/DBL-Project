@@ -42,12 +42,16 @@
     <div class="skipSelection">
       <h3>Select days between animation steps</h3>
       <p>Please select a value between 1 and 365</p>
-      <br>
-      <input type="number" id="numberInput" min="1" max="365" value="7">
+      <br />
+      <input type="number" id="numberInput" min="1" max="365" value="7" />
     </div>
 
     <div class="dataList">
       <ul id="list" class="column"></ul>
+    </div>
+
+    <div class="QOLbuttons" >
+      <button @click="resetSelection">Remove highlights</button>
     </div>
   </div>
 
@@ -69,13 +73,15 @@
       value="0"
       class="slider"
       id="range"
-      style="display: none;"
+      style="display: none"
       @input="showRangeValue"
       @change="update"
     />
-    <br>
+    <br />
     <p id="rangeValue"></p>
-    <button id="animationbtn" @click="animate" style="font-size: 20px;">Start animation</button>
+    <button id="animationbtn" @click="animate" style="font-size: 20px">
+      Start animation
+    </button>
   </div>
 </template>
 
@@ -143,22 +149,26 @@ export default {
     },
 
     extractName(email) {
-        // Splice off the email server
-        var nameBuilder = email.substring(0, email.indexOf("@"));
-        // Split mail into seperate names
-        nameBuilder = nameBuilder.split(".");
-        // Initialize surnames and capitalize
-        var name = "";
-        for (var i = 0; i < nameBuilder.length; i++) {
-            if (nameBuilder[i] != null && nameBuilder[i].length > 0) {
-                if (i < nameBuilder.length-1) {
-                    name = name + nameBuilder[i][0].toUpperCase() + ".";
-                } else {
-                    name = name + " " + nameBuilder[i][0].toUpperCase() + nameBuilder[i].substring(1);
-                }
-            }
+      // Splice off the email server
+      var nameBuilder = email.substring(0, email.indexOf("@"));
+      // Split mail into seperate names
+      nameBuilder = nameBuilder.split(".");
+      // Initialize surnames and capitalize
+      var name = "";
+      for (var i = 0; i < nameBuilder.length; i++) {
+        if (nameBuilder[i] != null && nameBuilder[i].length > 0) {
+          if (i < nameBuilder.length - 1) {
+            name = name + nameBuilder[i][0].toUpperCase() + ".";
+          } else {
+            name =
+              name +
+              " " +
+              nameBuilder[i][0].toUpperCase() +
+              nameBuilder[i].substring(1);
+          }
         }
-        return name
+      }
+      return name;
     },
     showDatabaseEntries(name) {
       var ul = document.getElementById("list");
@@ -175,7 +185,7 @@ export default {
         console.log(link);
         document.getElementById("range").style.display = "inline";
         document.getElementById("animationbtn").style.display = "initial";
-        this.update()
+        this.update();
         //this.animate()
       };
       ul.appendChild(header);
@@ -198,22 +208,24 @@ export default {
 
     async animate() {
       function sleep(ms) {
-        return new Promise(
-          resolve => setTimeout(resolve, ms)
-        );
+        return new Promise((resolve) => setTimeout(resolve, ms));
       }
 
       var x = document.getElementById("range").value;
       clickCounter++;
-      if(clickCounter % 2 === 1) {
+      if (clickCounter % 2 === 1) {
         document.getElementById("animationbtn").innerHTML = "&#x23F8;";
       } else {
         document.getElementById("animationbtn").innerHTML = "&#x23F5;";
       }
       var skip = parseInt(document.getElementById("numberInput").value); // how many days per step
-      for (var d = new Date(parseInt(x)); d.getTime() <= document.getElementById("range").max; d.setDate(d.getDate() + skip)) {
-        if(clickCounter % 2 === 1){
-          document.getElementById("range").value = d.getTime()
+      for (
+        var d = new Date(parseInt(x));
+        d.getTime() <= document.getElementById("range").max;
+        d.setDate(d.getDate() + skip)
+      ) {
+        if (clickCounter % 2 === 1) {
+          document.getElementById("range").value = d.getTime();
           console.log(skip);
           await this.update();
           await sleep(2000);
@@ -226,137 +238,141 @@ export default {
 
     async update() {
       var visDiv = document.getElementById(
-          document.getElementById("testSelectNL").value
-        );
-        visDiv.innerHTML = "";
+        document.getElementById("testSelectNL").value
+      );
+      visDiv.innerHTML = "";
 
-        visDiv = document.getElementById(
-          document.getElementById("testSelectAM").value
-        );
-        visDiv.innerHTML = "";
-        const response = await fetch(visLink);
-        var data = d3.csvParse(await response.text(), d3.autoType);
+      visDiv = document.getElementById(
+        document.getElementById("testSelectAM").value
+      );
+      visDiv.innerHTML = "";
+      const response = await fetch(visLink);
+      var data = d3.csvParse(await response.text(), d3.autoType);
 
-        var edges = [];
-        var nodes = [];
+      var edges = [];
+      var nodes = [];
 
-        // "edgeWeights.weight[source][target]" can be used to get the weight of the source-target edge
-        // "edgeWeights.maxWeight" is the largest edge weight in the dataset
-        // this is used as an intermediary variable to calculate wEdges (weighted edges)
-        var edgeWeights = {
-          weight: {},
-          maxWeight: 0,
-        };
+      // "edgeWeights.weight[source][target]" can be used to get the weight of the source-target edge
+      // "edgeWeights.maxWeight" is the largest edge weight in the dataset
+      // this is used as an intermediary variable to calculate wEdges (weighted edges)
+      var edgeWeights = {
+        weight: {},
+        maxWeight: 0,
+      };
 
-        // weighted edges (maybe we will replace edges with this, as it adds weights to edges and also should improve performance)
-        // a copy is required since generateNetworkCanvas modifies the wEdges parameter
-        var wEdges = [];
-        var wEdgesCopy = [];
+      // weighted edges (maybe we will replace edges with this, as it adds weights to edges and also should improve performance)
+      // a copy is required since generateNetworkCanvas modifies the wEdges parameter
+      var wEdges = [];
+      var wEdgesCopy = [];
 
-        // this function auto-executes whenever visualise is clicked
-        // the purpose of this function is to calculate the minDate and the maxDate of the given dataset
-        (function () {
-
-          maxDate = new Date(-3155692597470);
-          minDate = new Date(3155692597470);
-
-          data.forEach((x) => {
-            // check if current date is larger than maxDate
-            if (x.date > maxDate) {
-              maxDate = x.date;
-            }
-
-            // check if current date is smaller than minDate
-            if (x.date < minDate) {
-              minDate = x.date;
-            }
-          });
-
-          document.getElementById("range").max = maxDate.getTime();
-          document.getElementById("range").min = minDate.getTime();
-          // document.getElementById("range").value = (maxDate.getTime()+minDate.getTime())/2;
-
-        })();
-
-        this.showRangeValue();  // display date right after pressing visualise
-
-        data=data.filter((x) => {return x.date<=document.getElementById("range").value;});  // filter out datapoints given the slider
+      // this function auto-executes whenever visualise is clicked
+      // the purpose of this function is to calculate the minDate and the maxDate of the given dataset
+      (function () {
+        maxDate = new Date(-3155692597470);
+        minDate = new Date(3155692597470);
 
         data.forEach((x) => {
-          var objNodesTo = {};
-          var objNodesFrom = {};
-
-          var index = nodes.findIndex((o) => o.employeeID == x.fromId);
-          if (index === -1) {
-            objNodesFrom["employeeID"] = x.fromId;
-            objNodesFrom["email"] = x.fromEmail;
-            objNodesFrom["name"]=this.extractName(x.fromEmail);
-            objNodesFrom["jobTitle"] = x.fromJobtitle;
-            nodes.push(objNodesFrom);
-
-            // add missing node ID to edgeWeights
-            edgeWeights.weight[x.fromId] = {};
+          // check if current date is larger than maxDate
+          if (x.date > maxDate) {
+            maxDate = x.date;
           }
 
-          var index2 = nodes.findIndex((o) => o.employeeID == x.toId);
-          if (index2 === -1) {
-            objNodesTo["employeeID"] = x.toId;
-            objNodesTo["email"] = x.toEmail;
-            objNodesTo["name"]=this.extractName(x.toEmail);
-            objNodesTo["jobTitle"] = x.toJobtitle;
-            nodes.push(objNodesTo);
-
-            // add missing node ID to edgeWeights
-            edgeWeights.weight[x.toId] = {};
-          }
-
-          // init current edge with weight 0
-          edgeWeights.weight[x.fromId][x.toId] = 0;
-          let temp = ++edgeWeights.weight[x.fromId][x.toId];
-
-          if (temp > edgeWeights.maxWeight) {
-            edgeWeights.maxWeight = temp;
+          // check if current date is smaller than minDate
+          if (x.date < minDate) {
+            minDate = x.date;
           }
         });
 
-        // calculate edgeWeight values
-        data.forEach((x) => {
-          let temp = ++edgeWeights.weight[x.fromId][x.toId];
+        document.getElementById("range").max = maxDate.getTime();
+        document.getElementById("range").min = minDate.getTime();
+        // document.getElementById("range").value = (maxDate.getTime()+minDate.getTime())/2;
+      })();
 
-          if (temp > edgeWeights.maxWeight) {
-            edgeWeights.maxWeight = temp;
-          }
+      this.showRangeValue(); // display date right after pressing visualise
 
-          // add the edges to the edges array.
-          var objEdges = {};
-          objEdges["source"] = x.fromId;
-          objEdges["target"] = x.toId;
-          objEdges["sentiment"] = x.sentiment;
-          objEdges["messageType"] = x.messageType;
-          objEdges["date"] = x.date;
-          objEdges["weight"] = edgeWeights.weight[x.fromId][x.toId];
-          edges.push(objEdges);
+      data = data.filter((x) => {
+        return x.date <= document.getElementById("range").value;
+      }); // filter out datapoints given the slider
+
+      data.forEach((x) => {
+        var objNodesTo = {};
+        var objNodesFrom = {};
+
+        var index = nodes.findIndex((o) => o.employeeID == x.fromId);
+        if (index === -1) {
+          objNodesFrom["employeeID"] = x.fromId;
+          objNodesFrom["email"] = x.fromEmail;
+          objNodesFrom["name"] = this.extractName(x.fromEmail);
+          objNodesFrom["jobTitle"] = x.fromJobtitle;
+          nodes.push(objNodesFrom);
+
+          // add missing node ID to edgeWeights
+          edgeWeights.weight[x.fromId] = {};
+        }
+
+        var index2 = nodes.findIndex((o) => o.employeeID == x.toId);
+        if (index2 === -1) {
+          objNodesTo["employeeID"] = x.toId;
+          objNodesTo["email"] = x.toEmail;
+          objNodesTo["name"] = this.extractName(x.toEmail);
+          objNodesTo["jobTitle"] = x.toJobtitle;
+          nodes.push(objNodesTo);
+
+          // add missing node ID to edgeWeights
+          edgeWeights.weight[x.toId] = {};
+        }
+
+        // init current edge with weight 0
+        edgeWeights.weight[x.fromId][x.toId] = 0;
+        let temp = ++edgeWeights.weight[x.fromId][x.toId];
+
+        if (temp > edgeWeights.maxWeight) {
+          edgeWeights.maxWeight = temp;
+        }
+      });
+
+      // calculate edgeWeight values
+      data.forEach((x) => {
+        let temp = ++edgeWeights.weight[x.fromId][x.toId];
+
+        if (temp > edgeWeights.maxWeight) {
+          edgeWeights.maxWeight = temp;
+        }
+
+        // add the edges to the edges array.
+        var objEdges = {};
+        objEdges["source"] = x.fromId;
+        objEdges["target"] = x.toId;
+        objEdges["sentiment"] = x.sentiment;
+        objEdges["messageType"] = x.messageType;
+        objEdges["date"] = x.date;
+        objEdges["weight"] = edgeWeights.weight[x.fromId][x.toId];
+        edges.push(objEdges);
+      });
+
+      // create array of weighted edges
+      Object.keys(edgeWeights.weight).forEach((fromId) => {
+        Object.keys(edgeWeights.weight[fromId]).forEach((toId) => {
+          let objEdges = {};
+          let objEdgesCopy = {};
+          objEdges["source"] = parseInt(fromId);
+          objEdges["target"] = parseInt(toId);
+          objEdges["weight"] = edgeWeights.weight[fromId][toId];
+          objEdgesCopy["source"] = parseInt(fromId);
+          objEdgesCopy["target"] = parseInt(toId);
+          objEdgesCopy["weight"] = edgeWeights.weight[fromId][toId];
+
+          wEdges.push(objEdges);
+          wEdgesCopy.push(objEdgesCopy);
         });
+      });
 
-        // create array of weighted edges
-        Object.keys(edgeWeights.weight).forEach((fromId) => {
-          Object.keys(edgeWeights.weight[fromId]).forEach((toId) => {
-            let objEdges = {};
-            let objEdgesCopy = {};
-            objEdges["source"] = parseInt(fromId);
-            objEdges["target"] = parseInt(toId);
-            objEdges["weight"] = edgeWeights.weight[fromId][toId];
-            objEdgesCopy["source"] = parseInt(fromId);
-            objEdgesCopy["target"] = parseInt(toId);
-            objEdgesCopy["weight"] = edgeWeights.weight[fromId][toId];
+      generateNetworkCanvas(wEdges, nodes, edgeWeights, selectedNodes);
+      generateMatrix(wEdgesCopy, nodes, edgeWeights, selectedNodes);
+    },
 
-            wEdges.push(objEdges);
-            wEdgesCopy.push(objEdgesCopy);
-          });
-        });
-
-        generateNetworkCanvas(wEdges, nodes, edgeWeights, selectedNodes);
-        generateMatrix(wEdgesCopy, nodes, edgeWeights, selectedNodes);
+    resetSelection() {
+      selectedNodes.splice(0,selectedNodes.length);
     },
 
     openBar() {
@@ -491,6 +507,7 @@ export default {
 .dataList {
   height: 50%;
   overflow-y: auto;
+  border-bottom: 2px solid white;
 }
 
 .fileUpload {
@@ -500,6 +517,11 @@ export default {
 .windowSelection {
   padding: 30px;
   border-bottom: 2px solid white;
+}
+
+.QOLbuttons {
+  height: 20%;
+  overflow-y: auto;
 }
 
 .type {
