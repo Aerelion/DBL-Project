@@ -56,7 +56,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         ctx.translate(transform.x, transform.y);
         ctx.scale(transform.k, transform.k);
 
-        var neighbours = drawEdges(edges);
+        var neighbours = prepareEdges(edges);
 
         for (const node of nodes) {
             constrainNode(node);
@@ -93,13 +93,13 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         //node.y = Math.min(h-130, Math.max(2, node.y));
     }
 
-    function drawEdges(edges) {
+    function prepareEdges(edges) {
         var selectionEdges = [];
         var normalEdges = [];
         var neighbours = [];
 
         if (selectedNode[0] == null) {
-            edges.forEach(drawEdge);
+            drawAllEdges(edges, '#aaa');
         } else {
             for (const edge of edges) {
                 if (edge.source.employeeID == selectedNode[0]) {
@@ -112,18 +112,17 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
                     normalEdges.push(edge);
                 }
             }
-            ctx.beginPath();
-            normalEdges.forEach(drawEdge);
-            ctx.strokeStyle = "#aaa";
-            ctx.stroke();
+            drawAllEdges(normalEdges, '#aaa');
 
-            ctx.beginPath();
-            selectionEdges.forEach(drawEdge);
-            ctx.strokeStyle = "#f58a2c";
-            ctx.stroke();
+            drawAllEdges(selectionEdges, '#f58a2c');
         }
 
         return neighbours;
+    }
+
+    function drawAllEdges(edges, strokeColor) {
+        ctx.strokeStyle = strokeColor;
+        edges.forEach(drawEdge);
     }
 
     function drawEdge(d) {
@@ -132,7 +131,6 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         ctx.lineTo(d.target.x, d.target.y);
         ctx.lineWidth=(Math.log10(d.weight) * logCoefficient) + minWidth;
         // ctx.lineWidth = d.weight / edgeWeights.maxWeight;
-        ctx.strokeStyle = "#aaa";
         ctx.stroke();
         //ctx.fillText(d.sentiment, ((d.source.x + d.target.x) / 2) + 10 , ((d.source.y + d.target.y) / 2) + 3);
         //console.log(d.sentiment)
