@@ -6,8 +6,10 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
   var w = document.getElementById("viscontent").clientWidth;
   var h = document.getElementById("viscontent").clientHeight;
 
+  console.log(edgeWeights.weight)
+
   const textLength = 12;                                                        // change this to the approx max node text length
-  const lineHighlightOpacity = 0.2;                                             // opacity of highlight line (the orange part inside the highlight broders)
+  const lineHighlightOpacity = 0.4;                                             // opacity of highlight line (the orange part inside the highlight broders)
   const squareSize = Math.floor(h / (nodes.length + textLength)) - 1;           // the edge side length
   const strokeSize = squareSize / 4;                                            // the width of the highlight rectangle border
   const textSpace = squareSize * textLength;                                    // approx space allocated for text (important only to center the visualisation when rendering)
@@ -106,7 +108,7 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
     .append("text")
     .attr("text-anchor", "end")
     .attr("class", (d) => {
-      return "id" + d.employeeID;
+      return "hTextID" + d.employeeID;
     })
     .attr("x", textSpace - strokeSize)
     .attr("y", (d) => {
@@ -125,7 +127,7 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
     .attr("text-anchor", "end")
     .attr("transform", "rotate(90)")
     .attr("class", (d) => {
-      return "id" + d.employeeID;
+      return "vTextID" + d.employeeID;
     })
     .attr("x", textSpace - strokeSize)
     .attr("y", (d) => {
@@ -213,15 +215,6 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
 
   function updateHighlight() {
 
-    // highlight nodes that were highlighted in the NL diagram
-    globalSelection.forEach((node) => {
-      var index = localSelection.indexOf(node);
-      if (index === -1) {
-        highlightNode(node)
-        localSelection.push(node);
-      }
-    });
-
     // un-highlight nodes that are no longer highlighted in the NL diagram
     // slice creates a copy of localSelection, so that localSelection.splice doesn't interfere
     localSelection.slice().forEach((node) => {
@@ -229,21 +222,53 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
       if (index === -1) {
         unHighlightNode(node)
         localSelection.splice(localSelection.indexOf(node), 1);
+
+        // if a node is removed from the selection, but exactly one node remains, then highlight the neighbours of that node
+        if (localSelection.length == 1) {
+          highlightNeighbours(localSelection[0]);
+        }
+
+        // if no nodes are selected, then also remove neighbours
+        if (localSelection.length == 0) {
+          unHighlightText();
+        }
+      }
+    });
+
+    // highlight nodes that were highlighted in the NL diagram
+    globalSelection.forEach((node) => {
+      var index = localSelection.indexOf(node);
+      if (index === -1) {
+        localSelection.push(node);
+
+        // if a new node is added to selection, and is the only node, then highlight its neighbours
+        if (localSelection.length == 1) {
+          highlightNeighbours(localSelection[0]);
+        }
+
+        // if a new node is added to selection, and now there are two nodes, then unhighlight the neighbours of the first node
+        if (localSelection.length == 2) {
+          unHighlightNeighbours(localSelection[0], localSelection[1]);
+        }
+
+        highlightNode(node);
       }
     });
   }
 
   // (visually) highlight a node
   function highlightNode(node) {
-    text.selectAll("text.id" + node).style("fill", "red");
-    let classSelect = ".hBorderHighlightID" + node + ",.vBorderHighlightID" + node + ",.hLineHighlightID" + node + ",.vLineHighlightID" + node;
+    let classSelect = ".hTextID" + node + ",.vTextID" + node;
+    text.selectAll(classSelect).style("fill", "red");
+    classSelect = ".hBorderHighlightID" + node + ",.vBorderHighlightID" + node + ",.hLineHighlightID" + node + ",.vLineHighlightID" + node;
     svg.selectAll(classSelect).style("visibility", "visible");
   }
 
   // (visually) unhighlight a node
   function unHighlightNode(node) {
-    text.selectAll("text.id" + node).style("fill", "white");
-    let classSelect = ".hBorderHighlightID" + node + ",.vBorderHighlightID" + node + ",.hLineHighlightID" + node + ",.vLineHighlightID" + node;
+    let classSelect = ".hTextID" + node + ",.vTextID" + node;
+    text.selectAll(classSelect).style("fill", "white");
+    classSelect = ".hBorderHighlightID" + node + ",.vBorderHighlightID" + node + ",.hLineHighlightID" + node + ",.vLineHighlightID" + node;
     svg.selectAll(classSelect).style("visibility", "hidden");
   }
 
@@ -265,6 +290,49 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
     }
   }
 
+  // (visually) highlight the neighbours of a node
+  function highlightNeighbours(node) {
+    edges.forEach((edge) =>{
+
+      // highlight vertical neighbour
+      if(edge.source==node){
+        if(edge.target!=node){
+          text.select(".vTextID" + edge.target).style("fill", "#90ee90");
+        }
+      }
+
+      // highlight horizontal neighbour
+      if(edge.target==node){
+        if(edge.source!=node){
+          text.select(".hTextID" + edge.source).style("fill", "#90ee90");
+        }
+      }
+    })
+  }
+
+  // (visually) unhighlight the neighbours of a node
+  function unHighlightNeighbours(node1, node2) {
+    edges.forEach((edge) =>{
+
+      // unhighlight vertical neighbour
+      if(edge.source==node1){
+        if((edge.target!=node1) && (edge.target!=node2)){
+          text.select(".vTextID" + edge.target).style("fill", "white");
+        }
+      }
+
+      // unhighlight horizontal neighbour
+      if(edge.target==node1){
+        if((edge.source!=node1) && (edge.source!=node2)){
+          text.select(".hTextID" + edge.source).style("fill", "white");
+        }
+      }
+    })
+  }
+
+  function unHighlightText() {
+    text.selectAll("text").style("fill", "white");
+  }
 
   // SS stands for single selection (called in an event when ctrl is not pressed)
   // MS stands for multiple selection (called in an event when ctrl is pressed)
@@ -340,7 +408,8 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
     }
   }
 
-  setInterval(function () { updateHighlight(); }, 50);
+  setInterval(function () { updateHighlight(); }, 10);
+
 }
 
 export default generateMatrix
