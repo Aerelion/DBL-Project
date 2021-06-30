@@ -256,7 +256,7 @@ export default {
       // "edgeWeights.maxWeight" is the largest edge weight in the dataset
       // this is used as an intermediary variable to calculate wEdges (weighted edges)
       var edgeWeights = {
-        weight: {},
+        edge: {},
         maxWeight: 0,
       };
 
@@ -307,7 +307,7 @@ export default {
           nodes.push(objNodesFrom);
 
           // add missing node ID to edgeWeights
-          edgeWeights.weight[x.fromId] = {};
+          edgeWeights.edge[x.fromId] = {};
         }
 
         var index2 = nodes.findIndex((o) => o.employeeID == x.toId);
@@ -319,12 +319,14 @@ export default {
           nodes.push(objNodesTo);
 
           // add missing node ID to edgeWeights
-          edgeWeights.weight[x.toId] = {};
+          edgeWeights.edge[x.toId] = {};
         }
 
         // init current edge with weight 0
-        edgeWeights.weight[x.fromId][x.toId] = 0;
-        let temp = ++edgeWeights.weight[x.fromId][x.toId];
+        edgeWeights.edge[x.fromId][x.toId]={};
+        edgeWeights.edge[x.fromId][x.toId].weight = 0;
+        edgeWeights.edge[x.fromId][x.toId].sentiment = 0;
+        let temp = ++edgeWeights.edge[x.fromId][x.toId].weight;
 
         if (temp > edgeWeights.maxWeight) {
           edgeWeights.maxWeight = temp;
@@ -333,7 +335,9 @@ export default {
 
       // calculate edgeWeight values
       data.forEach((x) => {
-        let temp = ++edgeWeights.weight[x.fromId][x.toId];
+        let temp = ++edgeWeights.edge[x.fromId][x.toId].weight;
+
+        edgeWeights.edge[x.fromId][x.toId].sentiment+=x.sentiment;
 
         if (temp > edgeWeights.maxWeight) {
           edgeWeights.maxWeight = temp;
@@ -346,21 +350,23 @@ export default {
         objEdges["sentiment"] = x.sentiment;
         objEdges["messageType"] = x.messageType;
         objEdges["date"] = x.date;
-        objEdges["weight"] = edgeWeights.weight[x.fromId][x.toId];
+        objEdges["weight"] = edgeWeights.edge[x.fromId][x.toId].weight;
         edges.push(objEdges);
       });
 
       // create array of weighted edges
-      Object.keys(edgeWeights.weight).forEach((fromId) => {
-        Object.keys(edgeWeights.weight[fromId]).forEach((toId) => {
+      Object.keys(edgeWeights.edge).forEach((fromId) => {
+        Object.keys(edgeWeights.edge[fromId]).forEach((toId) => {
           let objEdges = {};
           let objEdgesCopy = {};
           objEdges["source"] = parseInt(fromId);
           objEdges["target"] = parseInt(toId);
-          objEdges["weight"] = edgeWeights.weight[fromId][toId];
+          objEdges["weight"] = edgeWeights.edge[fromId][toId].weight;
+          objEdges["sentiment"] = edgeWeights.edge[fromId][toId].sentiment;
           objEdgesCopy["source"] = parseInt(fromId);
           objEdgesCopy["target"] = parseInt(toId);
-          objEdgesCopy["weight"] = edgeWeights.weight[fromId][toId];
+          objEdgesCopy["weight"] = edgeWeights.edge[fromId][toId].weight;
+          objEdgesCopy["sentiment"] = edgeWeights.edge[fromId][toId].sentiment;
 
           wEdges.push(objEdges);
           wEdgesCopy.push(objEdgesCopy);

@@ -9,8 +9,8 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
     var h = document.getElementById("viscontent").clientHeight - 130;
     //var oldSelection = null;
 
-    const minWidth = 1;                                                              // width of an edge with weight 1
-    const maxWidth = 2;                                                                // width of largest edge
+    const minWidth = 0.01;                                                              // width of an edge with weight 1
+    const maxWidth = 1;                                                                // width of largest edge
     const logCoefficient = (maxWidth - minWidth) / Math.log10(edgeWeights.maxWeight); 
     const logCoefficient2 = (10 - minWidth) / Math.log2(edgeWeights.maxWeight); // coeficient that is used to calculate opacity
 

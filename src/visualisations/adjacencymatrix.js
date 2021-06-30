@@ -6,8 +6,6 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
   var w = document.getElementById("viscontent").clientWidth;
   var h = document.getElementById("viscontent").clientHeight;
 
-  console.log(edgeWeights.weight)
-
   const textLength = 12;                                                        // change this to the approx max node text length
   const lineHighlightOpacity = 0.4;                                             // opacity of highlight line (the orange part inside the highlight broders)
   const squareSize = Math.floor(h / (nodes.length + textLength)) - 1;           // the edge side length
@@ -95,7 +93,15 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
     })
     .attr("height", squareSize)
     .attr("width", squareSize)
-    .attr("fill", "white")
+    .style("fill", "white")
+    // .style("stroke", (d) => {
+    //   let r=127-(d.sentiment*100)
+    //   let g=127+(d.sentiment*100);
+    //   let b=0;
+
+    //   return "rgb("+r+","+g+","+b+")";
+    // })
+    // .attr("stroke-width", strokeSize)
     .style("opacity", ((d) => { return (Math.log2(d.weight) * logCoefficient) + minOpacity }));  // this makes it so that overlayed rectangles can be seen (kind of adds weights to the edges)
 
   var text = svg.append("g").attr("id", "matrixText");                 // all text nodes
@@ -292,18 +298,18 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
 
   // (visually) highlight the neighbours of a node
   function highlightNeighbours(node) {
-    edges.forEach((edge) =>{
+    edges.forEach((edge) => {
 
       // highlight vertical neighbour
-      if(edge.source==node){
-        if(edge.target!=node){
+      if (edge.source == node) {
+        if (edge.target != node) {
           text.select(".vTextID" + edge.target).style("fill", "#90ee90");
         }
       }
 
       // highlight horizontal neighbour
-      if(edge.target==node){
-        if(edge.source!=node){
+      if (edge.target == node) {
+        if (edge.source != node) {
           text.select(".hTextID" + edge.source).style("fill", "#90ee90");
         }
       }
@@ -312,18 +318,18 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
 
   // (visually) unhighlight the neighbours of a node
   function unHighlightNeighbours(node1, node2) {
-    edges.forEach((edge) =>{
+    edges.forEach((edge) => {
 
       // unhighlight vertical neighbour
-      if(edge.source==node1){
-        if((edge.target!=node1) && (edge.target!=node2)){
+      if (edge.source == node1) {
+        if ((edge.target != node1) && (edge.target != node2)) {
           text.select(".vTextID" + edge.target).style("fill", "white");
         }
       }
 
       // unhighlight horizontal neighbour
-      if(edge.target==node1){
-        if((edge.source!=node1) && (edge.source!=node2)){
+      if (edge.target == node1) {
+        if ((edge.source != node1) && (edge.source != node2)) {
           text.select(".hTextID" + edge.source).style("fill", "white");
         }
       }
