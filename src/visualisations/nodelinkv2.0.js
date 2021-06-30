@@ -7,7 +7,8 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
     var canvas = document.createElement('canvas');
     var w = document.getElementById("viscontent").clientWidth;
     var h = document.getElementById("viscontent").clientHeight - 130;
-    //var oldSelection = null;
+    var oldSelection = null;
+    var oldSelectionSize = 0;
 
     const minWidth = 0.01;                                                              // width of an edge with weight 1
     const maxWidth = 1;                                                                // width of largest edge
@@ -34,7 +35,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
             "charge",
             d3.forceManyBody()
                 .strength(-50)
-                .distanceMax(200))
+                .distanceMax(100))
         .force(
             "link",
             d3
@@ -57,28 +58,27 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         ctx.scale(transform.k, transform.k);
 
         var neighbours = prepareEdges(edges);
-
+        //console.log(neighbours);
         for (const node of nodes) {
             constrainNode(node);
             // Change selected node to stand out
-            if (node.employeeID == selectedNode[0]) {
+            if (selectedNode.includes(node.employeeID)) {
                 ctx.strokeStyle = "#000";
                 ctx.fillStyle = "#ff0000";
-            } else if (neighbours.indexOf(node) >= 0) {
+            } else if (neighbours.includes(node) && selectedNode.length <= 1) {
                 ctx.strokeStyle = "#000";
                 ctx.fillStyle = "#00ff00";
             } else {
                 ctx.strokeStyle = "#fff";
                 ctx.fillStyle = "#000";
             }
-            ctx.beginPath();
-            ctx.lineWidth=1;
-            drawNode(node)
-            ctx.fillStyle = color(node);
-            ctx.fill();
-            ctx.stroke();
+            if (selectedNode.includes(node.employeeID) || selectedNode.length <= 1) {
+                drawNode(node);
+            }
+            //drawNode(node)
         }
-        drawSelectionInformation(selectedNode[0]);
+        drawSelectionInformation();
+        //selectedNode.forEach(drawSelectionInformation)
     }
 
 
@@ -98,9 +98,9 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         var normalEdges = [];
         var neighbours = [];
 
-        if (selectedNode[0] == null) {
+        if (selectedNode[0] == null) { // No selection, draw all edges normally
             drawAllEdges(edges, '#aaa');
-        } else {
+        } else if (selectedNode[1] == null) { // 1 selection, draw connected edges and mark neighbouring nodes.
             for (const edge of edges) {
                 if (edge.source.employeeID == selectedNode[0]) {
                     selectionEdges.push(edge);
@@ -115,6 +115,25 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
             drawAllEdges(normalEdges, '#aaa');
 
             drawAllEdges(selectionEdges, '#f58a2c');
+        } else { // 2 or more selections, mark edges between selected nodes.
+            for (const edge of edges) {
+                var fromSelection = selectedNode.includes(edge.source.employeeID);
+                var toSelection = selectedNode.includes(edge.target.employeeID);
+                if (fromSelection && toSelection) {
+                    selectionEdges.push(edge);
+                } else if (fromSelection) {
+                    neighbours.push(edge.target);
+                    normalEdges.push(edge);
+                } else if (toSelection) {
+                    neighbours.push(edge.source);
+                    normalEdges.push(edge);
+                } else {
+                    normalEdges.push(edge);
+                }
+            }
+            //drawAllEdges(normalEdges, '#aaa');
+
+            drawAllEdges(selectionEdges, '#00f');
         }
 
         return neighbours;
@@ -137,37 +156,61 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
     }
 
     function drawNode(d) {
-        // ctx.beginPath();
+        ctx.beginPath();
+        ctx.lineWidth = 0.25;
         ctx.moveTo(d.x, d.y);
         ctx.arc(d.x, d.y, 3, 0, 2 * Math.PI);
-        // ctx.fillStyle = color(d);
-        // ctx.fill();
-        // ctx.stroke();
+        ctx.fillStyle = color(d);
+        ctx.fill();
+        ctx.stroke();
         //ctx.fillText("ID: " + d.employeeID, d.x+10, d.y+3);
     }
 
-    function drawSelectionInformation(id) {
+    function drawSelectionInformation() {
         for (const node of nodes) {
-            if (id == node.employeeID) {
-                drawNodeInformation(node);
-                break;
+            if (selectedNode.includes(node.employeeID)) {
+                if (selectedNode.length == 1) {
+                    drawNodeInformation(node, "Full");
+                    break;
+                } else if (selectedNode.length > 1) {
+                    drawNodeInformation(node, "Short");
+                }
             }
         }
     }
-    function drawNodeInformation(d) {
+    function drawNodeInformation(d, type) {
         if (d != null) {
-            var popupX = d.x + 10;
-            var popupY = d.y + 10;
-            var popupSize = ctx.measureText(d.email).width + 4;
+            var popupX, popupY;
+            var popupSize, popupHeight;
+            if (type == "Full") {
+                popupX = d.x + 6;
+                popupY = d.y + 6;
+                popupSize = ctx.measureText(d.email).width + 4;
+                popupHeight = 36;
+            } else if (type == "Short") {
+                popupX = d.x + 3;
+                popupY = d.y + 3;
+                popupSize = ctx.measureText(Math.max(d.jobTitle, d.name));
+                popupHeight = 26;
+            } else {
+                console.log("Unkown dataframe type specified");
+            }
             ctx.fillStyle = "#fff";
-            ctx.fillRect(popupX, popupY, popupSize, 36);
-
+            ctx.fillRect(popupX, popupY, popupSize, popupHeight);
             ctx.strokeStyle = "#000"
-            ctx.strokeRect(popupX, popupY, popupSize, 36);
-            ctx.fillStyle = "#000";
-            ctx.fillText(d.name + " | " + d.employeeID, popupX + 2, popupY + 10);
-            ctx.fillText(d.jobTitle, popupX + 2, popupY + 20);
-            ctx.fillText(d.email, popupX + 2, popupY + 30);
+            ctx.strokeRect(popupX, popupY, popupSize, popupHeight);
+
+            if (type == "Full") {
+                ctx.fillStyle = '#000';
+                ctx.fillText(d.name + " | " + d.employeeID, popupX + 2, popupY + 10);
+                ctx.fillText(d.jobTitle, popupX + 2, popupY + 20);
+                ctx.fillText(d.email, popupX + 2, popupY + 30);
+            } else if (type == "Short") {
+                ctx.fillStyle = "#fff";
+                ctx.fillText(d.name, popupX + 2, popupY + 10);
+                ctx.fillText(d.jobTitle, popupX + 2, popupY + 20);
+            }
+            
         }
     }
 
@@ -176,14 +219,15 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         return d => scale(d.group);
     }
 
-    // Update loop seperate from the tick function, thus not controlled by D3
-    // function heartBeat() {
-    //     if (simulation.alpha() < 0.01 && oldSelection != selectedNode[0]) {
-    //         console.log("Attempting wakeup");
-    //         simulation.alpha(0.01).restart();
-    //         oldSelection = selectedNode[0];
-    //     }
-    // }
+    //Update loop seperate from the tick function, thus not controlled by D3
+    function heartBeat() {
+         if (simulation.alpha() < 0.01 && (oldSelection != selectedNode[0] || oldSelectionSize != selectedNode.length)) {
+             console.log("Attempting wakeup");
+             simulation.alpha(0.01).restart();
+             oldSelection = selectedNode[0];
+             oldSelectionSize = selectedNode.length;
+         }
+    }
 
     function zooming(event) {
         transform = event.transform;
@@ -191,8 +235,9 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
     }
 
     function onClick(event) {
-        console.log(event.subject);
-        selectedNode[0] = event.subject.employeeID;
+        if (selectedNode.length <= 1) {
+            selectedNode[0] = event.subject.employeeID;
+        }
     }
 
     function dragNodes(simulation) {
@@ -229,7 +274,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
 
     console.log(zooming);
 
-    //setInterval(function () { heartBeat(); }, 50); // Check for updates every 500 ms
+    setInterval(function () { heartBeat(); }, 50); // Check for updates every 500 ms
     return d3.select(ctx.canvas).call(dragNodes(simulation)).node();
 }
 
