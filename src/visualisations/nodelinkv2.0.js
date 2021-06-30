@@ -77,7 +77,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
             }
             //drawNode(node)
         }
-        drawSelectionInformation();
+        drawSelectionInformation(neighbours);
         //selectedNode.forEach(drawSelectionInformation)
     }
 
@@ -176,13 +176,16 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         //ctx.fillText("ID: " + d.employeeID, d.x+10, d.y+3);
     }
 
-    function drawSelectionInformation() {
+    function drawSelectionInformation(neighbours) {
         for (const node of nodes) {
             if (selectedNode.includes(node.employeeID)) {
                 if (selectedNode.length == 1) {
                     drawNodeInformation(node, "Full");
-                    break;
                 } else if (selectedNode.length > 1) {
+                    drawNodeInformation(node, "Short");
+                }
+            } else if (neighbours.includes(node)) {
+                if (selectedNode.length == 1) {
                     drawNodeInformation(node, "Short");
                 }
             }
