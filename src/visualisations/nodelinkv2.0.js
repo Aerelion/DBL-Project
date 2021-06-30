@@ -133,15 +133,25 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
             }
             //drawAllEdges(normalEdges, '#aaa');
 
-            drawAllEdges(selectionEdges, '#00f');
+            drawAllEdges(selectionEdges, "Sentiment");
         }
 
         return neighbours;
     }
 
     function drawAllEdges(edges, strokeColor) {
-        ctx.strokeStyle = strokeColor;
-        edges.forEach(drawEdge);
+        if (strokeColor[0] == "#") {
+            ctx.strokeStyle = strokeColor;
+            edges.forEach(drawEdge);
+        } else {
+            edges.forEach(edge => {
+                let r=127-(edge.sentiment*100)
+                let g=127+(edge.sentiment*100);
+                let b=0;
+                ctx.strokeStyle = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                drawEdge(edge)
+            });
+        }
     }
 
     function drawEdge(d) {
