@@ -10,6 +10,22 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
     var oldSelection = null;
     var oldSelectionSize = 0;
 
+    var simplifiedEdges = [];
+    for (const oldEdge of edges) {
+        var isNew = true;
+        if (simplifiedEdges.length > 0) {
+            for (const edge of simplifiedEdges) {
+                if (edge.source == oldEdge.target && edge.target == oldEdge.source) {
+                    edge.weight = (edge.weight + oldEdge.weight);
+                    edge.sentiment = (edge.sentiment + oldEdge.sentiment) / 2;
+                    isNew = false;
+                }
+            }
+        }
+        if (isNew) {
+            simplifiedEdges.push(oldEdge);
+        }
+    }
     const minWidth = 0.01;                                                              // width of an edge with weight 1
     const maxWidth = 1;                                                                // width of largest edge
     const logCoefficient = (maxWidth - minWidth) / Math.log10(edgeWeights.maxWeight); 
@@ -43,7 +59,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
                 .id(function (d) {
                     return d.employeeID;
                 })
-                .links(edges)
+                .links(simplifiedEdges)
                 .strength(function (edge) {
                     console.log(edge)
                     return ((Math.log2(edge.weight) * logCoefficient2) + minWidth) / edgeWeights.maxWeight;
@@ -57,7 +73,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         ctx.translate(transform.x, transform.y);
         ctx.scale(transform.k, transform.k);
 
-        var neighbours = prepareEdges(edges);
+        var neighbours = prepareEdges(simplifiedEdges);
         //console.log(neighbours);
         for (const node of nodes) {
             constrainNode(node);

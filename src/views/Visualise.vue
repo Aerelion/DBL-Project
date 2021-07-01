@@ -362,11 +362,11 @@ export default {
           objEdges["source"] = parseInt(fromId);
           objEdges["target"] = parseInt(toId);
           objEdges["weight"] = edgeWeights.edge[fromId][toId].weight;
-          objEdges["sentiment"] = edgeWeights.edge[fromId][toId].sentiment;
+          objEdges["sentiment"] = edgeWeights.edge[fromId][toId].sentiment / objEdges["weight"];
           objEdgesCopy["source"] = parseInt(fromId);
           objEdgesCopy["target"] = parseInt(toId);
           objEdgesCopy["weight"] = edgeWeights.edge[fromId][toId].weight;
-          objEdgesCopy["sentiment"] = edgeWeights.edge[fromId][toId].sentiment;
+          objEdgesCopy["sentiment"] = edgeWeights.edge[fromId][toId].sentiment / objEdgesCopy["weight"];
 
           wEdges.push(objEdges);
           wEdgesCopy.push(objEdgesCopy);
