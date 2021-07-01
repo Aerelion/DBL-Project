@@ -11,7 +11,7 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
   const squareSize = Math.floor(h / (nodes.length + textLength)) - 1;           // the edge side length
   const strokeSize = squareSize / 4;                                            // the width of the highlight rectangle border
   const textSpace = squareSize * textLength;                                    // approx space allocated for text (important only to center the visualisation when rendering)
-  const minOpacity = 0.3;                                                       // opacity of an edge with weight 1
+  const minOpacity = 0.1;                                                       // opacity of an edge with weight 1
   const logCoefficient = (1 - minOpacity) / Math.log2(edgeWeights.maxWeight);   // coeficient that is used to calculate opacity
 
   // nodePositions is an object that stores the positions where the nodes should be displayed in the adj matrix
@@ -93,15 +93,27 @@ function generateMatrix(edges, nodes, edgeWeights, globalSelection) {
     })
     .attr("height", squareSize)
     .attr("width", squareSize)
-    .style("fill", "white")
-    // .style("stroke", (d) => {
-    //   let r=127-(d.sentiment*100)
-    //   let g=127+(d.sentiment*100);
-    //   let b=0;
-
-    //   return "rgb("+r+","+g+","+b+")";
-    // })
-    // .attr("stroke-width", strokeSize)
+    .style("fill", (d) => {
+      var sentiment = d.sentiment * (1 / 0.025);
+      var hue = Math.min(Math.max(-1, sentiment),1)*0.599*100 + 60;
+      var saturation = Math.min(1, Math.max(0.2, Math.abs(sentiment*1.5)));
+      var lightness = Math.max(0.5, Math.min(0.8, 1 - Math.abs(sentiment*1.2)));
+      //console.log(sentiment + ": " + hue + ", " + saturation + ", " + lightness);
+      var c = (1 - Math.abs(2*lightness - 1)) * saturation;
+      var x = c * (1 - Math.abs((hue / 60) % 2 - 1))
+      var m = lightness - c/2;
+      var r,g,b;
+      if (hue < 60) {
+          r = (c + m) * 255;
+          g = (x + m) * 255;
+          b = m * 255;
+      } else if (hue < 120) {
+          r = (x + m) * 255;
+          g = (c + m) * 255;
+          b = m * 255;
+      }
+      return "#" + ((1 << 24) + (Math.floor(r) << 16) + (Math.floor(g) << 8) + Math.floor(b)).toString(16).slice(1);
+    })
     .style("opacity", ((d) => { return (Math.log2(d.weight) * logCoefficient) + minOpacity }));  // this makes it so that overlayed rectangles can be seen (kind of adds weights to the edges)
 
   var text = svg.append("g").attr("id", "matrixText");                 // all text nodes
