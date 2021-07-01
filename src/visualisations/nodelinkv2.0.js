@@ -26,6 +26,29 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
             simplifiedEdges.push(oldEdge);
         }
     }
+    for (const edge of simplifiedEdges) {
+        var sentiment = edge.sentiment * (1 / 0.025);
+        var hue = Math.min(Math.max(-1, sentiment),1)*0.599*100 + 60;
+        var saturation = Math.min(1, Math.max(0.2, Math.abs(sentiment*1.5)));
+        var lightness = Math.max(0.5, Math.min(0.8, 1 - Math.abs(sentiment*1.2)));
+        //console.log(sentiment + ": " + hue + ", " + saturation + ", " + lightness);
+        var c = (1 - Math.abs(2*lightness - 1)) * saturation;
+        var x = c * (1 - Math.abs((hue / 60) % 2 - 1))
+        var m = lightness - c/2;
+        var r,g,b;
+        if (hue < 60) {
+            r = (c + m) * 255;
+            g = (x + m) * 255;
+            b = m * 255;
+        } else if (hue < 120) {
+            r = (x + m) * 255;
+            g = (c + m) * 255;
+            b = m * 255;
+        }
+        edge["color"] = "#" + ((1 << 24) + (Math.floor(r) << 16) + (Math.floor(g) << 8) + Math.floor(b)).toString(16).slice(1);
+        console.log(edge["color"]);
+    }
+
     const minWidth = 0.01;                                                              // width of an edge with weight 1
     const maxWidth = 1;                                                                // width of largest edge
     const logCoefficient = (maxWidth - minWidth) / Math.log10(edgeWeights.maxWeight); 
@@ -161,10 +184,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
             edges.forEach(drawEdge);
         } else {
             edges.forEach(edge => {
-                let r=127-(edge.sentiment*100)
-                let g=127+(edge.sentiment*100);
-                let b=0;
-                ctx.strokeStyle = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                ctx.strokeStyle = edge.color;
                 drawEdge(edge)
             });
         }
