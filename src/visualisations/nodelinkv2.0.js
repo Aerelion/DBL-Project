@@ -8,7 +8,8 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode, updateCo
     var side = document.getElementById(document.getElementById("testSelectNL").value);
     var canvas = document.createElement('canvas');
     var w = document.getElementById("viscontent").clientWidth;
-    var h = document.getElementById("viscontent").clientHeight - 130;
+    var h = document.getElementById("viscontent").clientHeight;
+    h = h*0.80 + 5
     var oldSelection = null;
     var oldSelectionSize = 0;
 
@@ -80,8 +81,8 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode, updateCo
         .force(
             "charge",
             d3.forceManyBody()
-                .strength(-50)
-                .distanceMax(100))
+                .strength(-20)
+                .distanceMax(250))
         .force(
             "link",
             d3
@@ -94,7 +95,10 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode, updateCo
                     return ((Math.log2(edge.weight) * logCoefficient2) + minWidth) / edgeWeights.maxWeight;
                 })
         )
-        .force("center", d3.forceCenter(w / 2, h / 2))
+        .force("center", 
+            d3
+                .forceCenter(w / 2, h / 2)
+                .strength(0.1))
         .on("tick", ticked);
 
     function ticked() {
@@ -323,6 +327,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode, updateCo
     }
 
     heartBeatInterval = setInterval(function () { heartBeat(); }, 50); // Check for updates every 500 ms
+    simulation.alpha(20).restart();
     return d3.select(ctx.canvas).call(dragNodes(simulation)).node();
 }
 

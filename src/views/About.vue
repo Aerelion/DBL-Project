@@ -87,7 +87,8 @@ The team members made working on the project an enjoyable experience!</p>
             <h3>Koen Mann</h3>
             <h4>Programmer</h4>
             <br>
-            <p>Text to be added</p>
+            <p>Hey! I am Koen and I worked on the nodelink diagram and visualisation interaction. I think our product provides a clear insight into the data 
+            and I enjoyed working on it together with this group.</p>
           </div>
           <div id="member6">
             <h3>Dembis Spaans</h3>
