@@ -281,6 +281,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode, updateCo
              oldSelectionSize = selectedNode.length;
          }
          if (updateCounter[0] != updateID) {
+            simulation.stop();
             simulation = null;
             clearInterval(heartBeatInterval);
          }
