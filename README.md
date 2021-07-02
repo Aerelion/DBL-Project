@@ -1,6 +1,7 @@
 DBL Project Group 34:
 
 The application is available at: https://aerelion.github.io/DBL-Project/
+
 The source code can also be found at: https://github.com/Aerelion/DBL-Project
 
 Our website is an application that can be used to visualise dynamic networks. The website has two pages: a "home" page and a "visualise" page. On the home page, there is some basic information about the website, how to use it, and about the team that created it. The visualise page is where you can uipload a dataset, and then visualise it. We offer two distinct visualisations: a force directed node-link diagram and an adjacency matrix visualisation. Unfortunately, at the moment, only the given Enron dataset is compatible with the two visualisations.
