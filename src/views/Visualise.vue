@@ -99,6 +99,7 @@ var visLink;
 var minDate;
 var maxDate;
 var selectedNodes = [];
+var updateCounter = [];
 var clickCounter = 0;
 
 export default {
@@ -373,7 +374,12 @@ export default {
         });
       });
 
-      generateNetworkCanvas(wEdges, nodes, edgeWeights, selectedNodes);
+      if (updateCounter[0] != null) {
+        updateCounter[0]++;
+      } else {
+        updateCounter[0] = 0;
+      }
+      generateNetworkCanvas(wEdges, nodes, edgeWeights, selectedNodes, updateCounter);
       generateMatrix(wEdgesCopy, nodes, edgeWeights, selectedNodes);
     },
 

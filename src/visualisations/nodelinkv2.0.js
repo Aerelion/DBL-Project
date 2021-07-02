@@ -2,7 +2,9 @@ import * as d3 from "d3";
 
 
 
-function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
+function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode, updateCounter) {
+    var heartBeatInterval;
+    var updateID;
     var side = document.getElementById(document.getElementById("testSelectNL").value);
     var canvas = document.createElement('canvas');
     var w = document.getElementById("viscontent").clientWidth;
@@ -31,7 +33,6 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         var hue = Math.min(Math.max(-1, sentiment),1)*0.599*100 + 60;
         var saturation = Math.min(1, Math.max(0.2, Math.abs(sentiment*1.5)));
         var lightness = Math.max(0.5, Math.min(0.8, 1 - Math.abs(sentiment*1.2)));
-        //console.log(sentiment + ": " + hue + ", " + saturation + ", " + lightness);
         var c = (1 - Math.abs(2*lightness - 1)) * saturation;
         var x = c * (1 - Math.abs((hue / 60) % 2 - 1))
         var m = lightness - c/2;
@@ -46,7 +47,6 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
             b = m * 255;
         }
         edge["color"] = "#" + ((1 << 24) + (Math.floor(r) << 16) + (Math.floor(g) << 8) + Math.floor(b)).toString(16).slice(1);
-        console.log(edge["color"]);
     }
 
     const minWidth = 0.01;                                                              // width of an edge with weight 1
@@ -54,6 +54,13 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
     const logCoefficient = (maxWidth - minWidth) / Math.log10(edgeWeights.maxWeight); 
     const logCoefficient2 = (10 - minWidth) / Math.log2(edgeWeights.maxWeight); // coeficient that is used to calculate opacity
 
+    if (updateCounter[0] != null) {
+        updateID = updateCounter[0];
+    } else {
+        updateID = 0;
+    }
+
+    canvas.id = "NLCanvas";
     canvas.width = w;
     canvas.height = h;
     // Creates a circle bound with diameter of the smallest of either the width or height of the window.
@@ -84,7 +91,6 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
                 })
                 .links(simplifiedEdges)
                 .strength(function (edge) {
-                    console.log(edge)
                     return ((Math.log2(edge.weight) * logCoefficient2) + minWidth) / edgeWeights.maxWeight;
                 })
         )
@@ -97,7 +103,6 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         ctx.scale(transform.k, transform.k);
 
         var neighbours = prepareEdges(simplifiedEdges);
-        //console.log(neighbours);
         for (const node of nodes) {
             constrainNode(node);
             // Change selected node to stand out
@@ -114,10 +119,8 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
             if (selectedNode.includes(node.employeeID) || selectedNode.length <= 1) {
                 drawNode(node);
             }
-            //drawNode(node)
         }
         drawSelectionInformation(neighbours);
-        //selectedNode.forEach(drawSelectionInformation)
     }
 
 
@@ -198,7 +201,6 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
         // ctx.lineWidth = d.weight / edgeWeights.maxWeight;
         ctx.stroke();
         //ctx.fillText(d.sentiment, ((d.source.x + d.target.x) / 2) + 10 , ((d.source.y + d.target.y) / 2) + 3);
-        //console.log(d.sentiment)
     }
 
     function drawNode(d) {
@@ -271,17 +273,16 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
     //Update loop seperate from the tick function, thus not controlled by D3
     function heartBeat() {
          if (simulation.alpha() < 0.01 && (oldSelection != selectedNode[0] || oldSelectionSize != selectedNode.length)) {
-             console.log("Attempting wakeup");
              simulation.alpha(0.01).restart();
              oldSelection = selectedNode[0];
              oldSelectionSize = selectedNode.length;
          }
+         if (updateCounter[0] != updateID) {
+            simulation = null;
+            clearInterval(heartBeatInterval);
+         }
     }
 
-    function zooming(event) {
-        transform = event.transform;
-        ticked();
-    }
 
     function onClick(event) {
         if (selectedNode.length <= 1) {
@@ -321,9 +322,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode) {
             .on("end", dragEnded)
     }
 
-    console.log(zooming);
-
-    setInterval(function () { heartBeat(); }, 50); // Check for updates every 500 ms
+    heartBeatInterval = setInterval(function () { heartBeat(); }, 50); // Check for updates every 500 ms
     return d3.select(ctx.canvas).call(dragNodes(simulation)).node();
 }
 
