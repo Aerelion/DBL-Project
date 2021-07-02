@@ -50,7 +50,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode, updateCo
         edge["color"] = "#" + ((1 << 24) + (Math.floor(r) << 16) + (Math.floor(g) << 8) + Math.floor(b)).toString(16).slice(1);
     }
 
-    const minWidth = 0.01;                                                              // width of an edge with weight 1
+    const minWidth = 0.1;                                                              // width of an edge with weight 1
     const maxWidth = 1;                                                                // width of largest edge
     const logCoefficient = (maxWidth - minWidth) / Math.log10(edgeWeights.maxWeight); 
     const logCoefficient2 = (10 - minWidth) / Math.log2(edgeWeights.maxWeight); // coeficient that is used to calculate opacity
@@ -82,7 +82,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode, updateCo
             "charge",
             d3.forceManyBody()
                 .strength(-20)
-                .distanceMax(250))
+                .distanceMax(boundDistance * 0.5))
         .force(
             "link",
             d3
@@ -97,8 +97,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode, updateCo
         )
         .force("center", 
             d3
-                .forceCenter(w / 2, h / 2)
-                .strength(0.1))
+                .forceCenter(w / 2, h / 2))
         .on("tick", ticked);
 
     function ticked() {
@@ -277,7 +276,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode, updateCo
     //Update loop seperate from the tick function, thus not controlled by D3
     function heartBeat() {
          if (simulation.alpha() < 0.01 && (oldSelection != selectedNode[0] || oldSelectionSize != selectedNode.length)) {
-             simulation.alpha(0.01).restart();
+             simulation.alpha(0.004).restart();
              oldSelection = selectedNode[0];
              oldSelectionSize = selectedNode.length;
          }
@@ -327,7 +326,7 @@ function generateNetworkCanvas(edges, nodes, edgeWeights, selectedNode, updateCo
     }
 
     heartBeatInterval = setInterval(function () { heartBeat(); }, 50); // Check for updates every 500 ms
-    simulation.alpha(20).restart();
+    simulation.alphaDecay(0.0025).alpha(1).restart();
     return d3.select(ctx.canvas).call(dragNodes(simulation)).node();
 }
 
