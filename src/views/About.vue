@@ -80,7 +80,8 @@ The team members made working on the project an enjoyable experience!</p>
             <h3>Berkay Kösebay</h3>
             <h4>Lead programmer</h4>
             <br>
-            <p>Text to be added</p>
+            <p>Hi, my name is Berkay and I was one of the programmers of the team. I worked on creating the first version of the node-link diagram and created the functions responsible retrieving the data-sets in usable
+               form from the database for the visualisations. I really enjoyed working together with all of my team members on this project.</p>
           </div>
           <div id="member5">
             <h3>Koen Mann</h3>
