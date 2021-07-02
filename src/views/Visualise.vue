@@ -67,7 +67,7 @@
       type="range"
       min="1"
       max="100"
-      value="0"
+      value="100000000000000"
       class="slider"
       id="range"
       style="display: none"
@@ -250,6 +250,12 @@ export default {
       const response = await fetch(visLink);
       var data = d3.csvParse(await response.text(), d3.autoType);
 
+      if (updateCounter[0] != null) {
+        updateCounter[0]++;
+      } else {
+        updateCounter[0] = 0;
+      }
+
       var edges = [];
       var nodes = [];
 
@@ -286,7 +292,10 @@ export default {
 
         document.getElementById("range").max = maxDate.getTime();
         document.getElementById("range").min = minDate.getTime();
-        // document.getElementById("range").value = (maxDate.getTime()+minDate.getTime())/2;
+
+        if(updateCounter[0]==0){
+          document.getElementById("range").value = maxDate.getTime();
+        }
       })();
 
       this.showRangeValue(); // display date right after pressing visualise
@@ -374,11 +383,6 @@ export default {
         });
       });
 
-      if (updateCounter[0] != null) {
-        updateCounter[0]++;
-      } else {
-        updateCounter[0] = 0;
-      }
       generateNetworkCanvas(wEdges, nodes, edgeWeights, selectedNodes, updateCounter);
       generateMatrix(wEdgesCopy, nodes, edgeWeights, selectedNodes);
     },
