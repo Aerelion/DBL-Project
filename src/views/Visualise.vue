@@ -583,5 +583,6 @@ export default {
   position: absolute;
   right: 2%;
   bottom: 40%;
+  height: auto;
 }
 </style>

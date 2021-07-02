@@ -56,13 +56,16 @@
             <h3>Andree Ştef</h3>
             <h4>Scrum master and programmer</h4>
             <br>
-            <p>Text to be added</p>
+            <p>Hi! I'm Andree and I was the scrum master of the team. I made the adjacency matrix visualisation, and worked on improving the website performance.
+               Although there have been minor setbacks throughout the development process, I believe we managed to make a good product, and I enjoyed working with everyone else on this list.</p>
           </div>
           <div id="member2">
             <h3>Hannes Janmaat</h3>
             <h4>Report and deadline manager</h4>
             <br>
-            <p>Text to be added</p>
+            <p>Hello! I am Hannes and I was in charge of most of the report and other 
+deadlines there were during the project, such as the evaluation.
+The team members made working on the project an enjoyable experience!</p>
           </div>
           <div id="member3">
             <h3>Tijn Koppert</h3>
@@ -89,7 +92,7 @@
             <h3>Dembis Spaans</h3>
             <h4>Report writer and programmer</h4>
             <br>
-            <p>Text to be added</p>
+            <p>Hi, I am Dembis. I worked on some stuff on the website and the report. Enjoy our beautiful visualizations!</p>
           </div>
         </div>
       </div>
